@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Does classifying pollen from full 3D microscope stacks beat working from 2D projections of the same images?">
+<meta name="description" content="Enhancing pollen classification accuracy through the use of whole stack images in 3D convolutional neural networks.">
 <title>3D CNNs for pollen classification | Shreya Sebastian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,27 +24,48 @@
     <a class="crumb" href="/projects/">← All projects</a>
     <p class="eyebrow">BSc thesis · Leiden University</p>
     <h1>3D CNNs for pollen classification</h1>
-    <p class="summary">Does classifying pollen from full 3D microscope stacks beat working from 2D projections of the same images?</p>
+    <p class="summary">Enhancing pollen classification accuracy through the use of whole stack images in 3D convolutional neural networks.</p>
     
   </div>
 </header>
 <div class="container p-layout">
   <article class="prose">
 
-<h2>Overview</h2>
-<p>Pollen grains are imaged under the microscope as Z-stacks, series of images at different focal depths. Earlier work on automatic classification of Urticaceae pollen used 2D projections of these stacks. This thesis builds on that work and asks whether models that see the full 3D stack do better.</p>
-<h2>Approach</h2>
+<h2>The problem</h2>
+<p>Telling the pollen of Parietaria and Urtica, two genera of the nettle family (Urticaceae), apart under the microscope is hard because the grains look very similar. A microscope captures each grain as a Z-stack: a series of images at different focal depths. Earlier work classified these grains from 2D projections of the stack, which compress the depth information into a single image.</p>
+<p>This thesis asks whether a network that sees the whole stack in 3D does better.</p>
+<h2>Data and preprocessing</h2>
 <ul>
-<li>Implemented a custom ConvNet3D and a torchvision ResNet3D in PyTorch.</li>
-<li>Trained them on about 600 raw Z-stacks of variable size, and compared them with models trained on 2D projections of the same data.</li>
+<li>Three classes: Parietaria, Urtica dioica/urens and Urtica membranacea.</li>
+<li>Each stack is zero-padded or cropped to 224 × 224 pixels, the middle frames are kept, and values are rescaled to [−1, 1].</li>
+<li>A held-out test set and a validation set are split off. Training stacks are augmented with flips and rotations; an augmentation threshold controls how many extra samples are generated.</li>
 </ul>
-<h2>Result</h2>
-<p>The best model reached 95 percent test accuracy.</p>
-<p>The project builds on <a href="https://www.sciencedirect.com/science/article/pii/S0925231222014308">Analysis of automatic image classification methods for Urticaceae pollen classification</a>.</p>
+<h2>Models</h2>
+<ul>
+<li><b>Baseline 3D CNN.</b> Two 3D convolution layers with max pooling and dropout, followed by fully connected layers.</li>
+<li><b>ResNet3D.</b> torchvision's r3d_18 video network with its first layer adapted to the pollen stacks and a three-class output.</li>
+</ul>
+<p>Both were trained with cross-entropy and AdamW on Google Colab, keeping the checkpoint with the best validation accuracy, and evaluated on accuracy and weighted F1.</p>
+<h2>Results</h2>
+<p>The baseline overfitted quickly: validation accuracy peaked around 0.84 while training accuracy kept rising. ResNet3D performed better and was used for tuning and the remaining experiments.</p>
+<div class="table-wrap"><table>
+<tr><th>ResNet3D, learning rate</th><th>Test loss</th><th>Weighted F1</th><th>Accuracy</th></tr>
+<tr><td>1e-4</td><td>0.211</td><td>0.949</td><td>0.950</td></tr>
+<tr><td>1e-5</td><td>0.363</td><td>0.859</td><td>0.867</td></tr>
+<tr><td>1e-6</td><td>0.444</td><td>0.788</td><td>0.800</td></tr>
+</table></div>
+<ul>
+<li><b>Augmentation.</b> Augmenting half of the training set gave the best test accuracy in a short tuning run (0.79, against 0.70 to 0.71 for the other settings).</li>
+<li><b>Whole stack against subsections.</b> Training on only the middle frames gave unstable learning curves. The full 20-frame stack gave the best results, which suggests the outer frames of the stack carry useful information.</li>
+<li><b>Transfer learning.</b> Starting from weights pretrained on video overfitted the training data and did not improve test accuracy.</li>
+</ul>
+<h2>Conclusion</h2>
+<p>A ResNet3D trained on the whole stack reached 95 percent test accuracy. The 3D models are complex relative to the amount of data, so larger datasets and k-fold cross-validation are the natural next steps.</p>
+<p>The project builds on <a href="https://doi.org/10.1016/j.neucom.2022.11.042">Analysis of automatic image classification methods for Urticaceae pollen classification</a> (Li et al., 2023).</p>
 
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>BSc thesis, Leiden University, 2023</dd></div><div><dt>Stack</dt><dd>Python, PyTorch, torchvision</dd></div></dl>
+    <dl><div><dt>Type</dt><dd>BSc thesis, Leiden University, 2023</dd></div><div><dt>Classes</dt><dd>Parietaria, Urtica dioica/urens, Urtica membranacea</dd></div><div><dt>Stack</dt><dd>Python, PyTorch, torchvision, scikit-learn, Google Colab</dd></div></dl>
     <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/3D_ConvNN_Pollen_Classification">Code ↗</a></div>
   </aside>
 </div>
