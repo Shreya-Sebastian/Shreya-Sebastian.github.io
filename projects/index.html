@@ -22,12 +22,13 @@
 <header class="page-head">
   <div class="container">
     <h1>Projects</h1>
-    <p>Theses, personal projects and course projects, grouped by topic. Each page describes the problem, the approach and the results.</p>
-    <div class="filters" role="group" aria-label="Filter projects"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="thesis" aria-pressed="false">Theses</button><button type="button" data-filter="personal" aria-pressed="false">Personal projects</button><button type="button" data-filter="course" aria-pressed="false">Course projects</button></div>
+    <p>Theses, personal projects and course projects. Each page describes the problem, the approach and the results.</p>
+    <div class="filters" role="group" aria-label="Filter projects"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="ml" aria-pressed="false">Machine learning</button><button type="button" data-filter="engineering" aria-pressed="false">Engineering</button><button type="button" data-filter="vis" aria-pressed="false">Visualisation</button></div>
   </div>
 </header>
 <div class="container" style="padding-bottom:72px">
-<div class="group"><h2>Machine learning and research</h2><div class="grid-auto"><article class="card" data-kind="personal">
+<div class="grid-auto project-grid">
+<article class="card" data-kind="ml">
   <div class="thumb fig"><img src="/img/retrostc.png" alt="Plot of consolidation against the timing of a salient event" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Research · open source</span>
@@ -37,7 +38,7 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="thesis">
+<article class="card" data-kind="ml">
   <div class="thumb fig"><img src="/img/thesis_env_context_profiles.png" alt="Bar chart of the four sensor features for each of the six activity contexts" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">MSc thesis · TU Delft</span>
@@ -47,7 +48,7 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="course">
+<article class="card" data-kind="ml">
   <div class="thumb fig"><img src="/img/llm_panel_f1.png" alt="Line chart of agreement F1 per iteration for the baseline and feedback conditions" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Group research project · TU Delft</span>
@@ -57,8 +58,8 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="thesis">
-  
+<article class="card" data-kind="ml">
+  <div class="thumb placeholder" aria-hidden="true"><span>Machine learning</span></div>
   <div class="card-body">
     <span class="kicker">BSc thesis · Leiden University</span>
     <h3><a href="/projects/bsc-thesis/">3D CNNs for pollen classification</a></h3>
@@ -67,7 +68,7 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="course">
+<article class="card" data-kind="ml">
   <div class="thumb"><img src="/img/dl_repro_output.png" alt="An underwater photo of a diver: raw input, reference and the model&#x27;s enhanced output" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Deep Learning · TU Delft</span>
@@ -76,7 +77,8 @@
     <ul class="tags"><li>PyTorch</li><li>Computer vision</li><li>Image enhancement</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
-</article></div></div><div class="group"><h2>Software and data engineering</h2><div class="grid-auto"><article class="card" data-kind="personal">
+</article>
+<article class="card" data-kind="engineering">
   <div class="thumb"><img src="/img/techjobsradar.png" alt="Tech Jobs Radar overview page with skill demand charts" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Live since September 2026</span>
@@ -86,7 +88,7 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="course">
+<article class="card" data-kind="engineering">
   <div class="thumb fig"><img src="/img/sensor_poc_architecture.png" alt="Architecture diagram: sensors with local buffers send HTTP requests to an ingestion server, message queue and consumer" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Software Architecture · TU Delft</span>
@@ -96,8 +98,8 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="personal">
-  
+<article class="card" data-kind="engineering">
+  <div class="thumb placeholder" aria-hidden="true"><span>Engineering</span></div>
   <div class="card-body">
     <span class="kicker">Personal project</span>
     <h3><a href="/projects/moneytrail/">Moneytrail</a></h3>
@@ -105,8 +107,9 @@
     <ul class="tags"><li>Python</li><li>DuckDB</li><li>RapidFuzz</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
-</article></div></div><div class="group"><h2>Visualisation and interaction</h2><div class="grid-auto"><article class="card" data-kind="personal">
-  
+</article>
+<article class="card" data-kind="vis">
+  <div class="thumb placeholder" aria-hidden="true"><span>Visualisation</span></div>
   <div class="card-body">
     <span class="kicker">Personal project</span>
     <h3><a href="/projects/ar-gestures/">AR gestures</a></h3>
@@ -115,8 +118,8 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
-<article class="card" data-kind="course">
-  
+<article class="card" data-kind="vis">
+  <div class="thumb placeholder" aria-hidden="true"><span>Visualisation</span></div>
   <div class="card-body">
     <span class="kicker">Data Visualisation · TU Delft</span>
     <h3><a href="/projects/earthquake-map/">Earthquake visualizer</a></h3>
@@ -124,7 +127,8 @@
     <ul class="tags"><li>D3</li><li>OpenLayers</li><li>JavaScript</li><li>Vite</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
-</article></div></div>
+</article>
+</div>
 </div>
 
 </main>

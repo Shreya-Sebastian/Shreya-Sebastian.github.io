@@ -13,18 +13,12 @@ document.querySelectorAll('[data-copy]').forEach(function (btn) {
 (function () {
   var bar = document.querySelector('.filters'); if (!bar) return;
   var buttons = bar.querySelectorAll('button');
+  var cards = document.querySelectorAll('.project-grid .card');
   bar.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     var f = b.getAttribute('data-filter');
     buttons.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    document.querySelectorAll('.group').forEach(function (g) {
-      var any = false;
-      g.querySelectorAll('.card').forEach(function (c) {
-        var show = f === 'all' || (' ' + c.getAttribute('data-kind') + ' ').indexOf(' ' + f + ' ') > -1;
-        c.hidden = !show; if (show) any = true;
-      });
-      g.hidden = !any;
-    });
+    cards.forEach(function (c) { c.hidden = !(f === 'all' || c.getAttribute('data-kind') === f); });
   });
 })();
 
