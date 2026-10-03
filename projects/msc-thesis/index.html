@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Discovering latent interaction contexts from multimodal behavioural data for social inclusion analysis in an inclusive preschool.">
+<meta name="description" content="Automated discovery of latent activity contexts from multimodal sensing, to analyse peer interaction of preschoolers with hearing loss in an inclusive classroom.">
 <title>Social inclusion from sensor data | Shreya Sebastian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,51 +24,71 @@
     <a class="crumb" href="/projects/">← All projects</a>
     <p class="eyebrow">MSc thesis · TU Delft</p>
     <h1>Social inclusion from sensor data</h1>
-    <p class="summary">Discovering latent interaction contexts from multimodal behavioural data for social inclusion analysis in an inclusive preschool.</p>
-    <figure class="p-figure"><canvas class="clusters" role="img" aria-label="Illustration of seven clusters of data points"></canvas></figure>
+    <p class="summary">Automated discovery of latent activity contexts from multimodal sensing, to analyse peer interaction of preschoolers with hearing loss in an inclusive classroom.</p>
+    
   </div>
 </header>
 <div class="container p-layout">
   <article class="prose">
 
 <h2>The problem</h2>
-<p>In inclusive classrooms, the physical presence of children with hearing loss does not guarantee social inclusion with typically hearing peers. Self-report is biased, and manual observation is too labour-intensive for fine-grained, full-day coverage. Wearable sensing can record continuous co-presence and vocal activity, but the meaning of those signals depends on what the room is doing: a quiet sedentary minute and a free-play minute are not comparable.</p>
-<p>The thesis therefore turns continuous sensor streams into child-minute rows labelled with an activity context, and tests inclusion within each context.</p>
+<p>In inclusive classrooms, the physical presence of children with hearing loss (HL) does not guarantee social inclusion with their typically hearing (TH) peers. Self-report is biased, and manual observation is too labour-intensive to cover a full school day at fine temporal resolution.</p>
+<p>Inclusion is also not a stable trait of a child: it varies with what the class is doing. A daily average over context-specific effects of opposite sign can hide both. The thesis therefore labels every child-minute with an activity context discovered from the sensors, and compares HL and TH children within each context.</p>
 <h2>Research questions</h2>
 <div class="callout"><p><b>RQ1.</b> Can interpretable latent activity contexts be recovered from fused ultra-wideband (UWB) spatial data and LENA acoustic data using unsupervised clustering?</p>
-<p><b>RQ2.</b> Within each context, do children with and without hearing loss differ on three sensor-derivable markers of inclusion: peer co-presence, vocal participation rate and peer affiliation patterns?</p></div>
-<h2>Pipeline</h2>
-<ul>
-<li><b>Spatial features.</b> UWB tracking at 10 Hz gives position and orientation per child. Per-frame displacement is computed, and conversational groups (F-formations) are detected with Dominant Sets clustering on a socio-spatial affinity of proximity and mutual orientation.</li>
-<li><b>Acoustic features.</b> LENA speaker-type segments are binned to one-minute epochs: adult word count, auditory overlap and utterance counts.</li>
-<li><b>Context discovery.</b> The streams are joined per child and minute, averaged at room level over four features (adult word count, auditory overlap, displacement and teacher distance), power-transformed and clustered with a full-covariance Gaussian Mixture Model. The number of components is fixed from the classroom's daily routine; assignment and profiles come from the sensor data.</li>
-<li><b>Inference.</b> Per-context linear mixed models with a random intercept per child test the hearing loss contrast on each marker, alongside Mann-Whitney U tests on per-child homophily.</li>
-</ul>
-<h2>Recovered activity contexts</h2>
-<div class="table-wrap"><table>
-<tr><th>Context</th><th>Share</th><th>Sensor signature</th></tr>
-<tr><td>Teacher-proximal group activity</td><td>~25%</td><td>High adult speech, lowest teacher distance, low movement</td></tr>
-<tr><td>Teacher-led direct instruction</td><td>~14%</td><td>Highest adult speech, low overlap</td></tr>
-<tr><td>Quiet sedentary activity</td><td>~6%</td><td>Lowest auditory overlap, few utterances</td></tr>
-<tr><td>Structured seated conversation</td><td>~10%</td><td>Near-zero displacement, moderate overlap</td></tr>
-<tr><td>Active peer interaction</td><td>~16%</td><td>High displacement, moderate teacher distance</td></tr>
-<tr><td>Free play</td><td>~22%</td><td>High overlap, moderate to high displacement</td></tr>
-<tr><td>Dispersed high-movement transition</td><td>~6%</td><td>Least adult speech, most overlap, movement and teacher distance</td></tr>
-</table></div>
-<h2>Findings</h2>
-<ul>
-<li><b>Peer co-presence.</b> No difference in most contexts; children with hearing loss were more often co-present with peers only during quiet sedentary activity.</li>
-<li><b>Vocal participation.</b> The deficit for children with hearing loss concentrated in active peer interaction, free play and transitions, the contexts with the least adult scaffolding.</li>
-<li><b>Peer affiliation.</b> The most consistent marker: children with hearing loss spent more grouped time in mixed groups than their typically hearing peers across all contexts.</li>
-</ul>
-<p>The pooled analysis across contexts showed almost no effect for peer co-presence. The effects were there, but only became visible once the analysis was conditioned on context. The results were presented to developmental psychologists, who cared about what the findings meant in practice.</p>
+<p><b>RQ2.</b> Within each context, do HL and TH children differ on three sensor-derivable markers of inclusion: peer co-presence, vocal participation rate and peer affiliation patterns?</p></div>
 <h2>Data</h2>
-<p>The dataset contains child-worn audio and indoor tracking of minors, collected under a research-ethics protocol that does not permit public release. The repository contains the analysis pipeline only.</p>
-<p>Three months into the project the originally planned data became unavailable, so I defined a new research question and designed this pipeline for it.</p>
+<p>One inclusive preschool classroom with 13 children (6 HL, 7 TH), recorded over 13 days for about 164 minutes per child per day. Each child wears a vest with two UWB tags, giving position and shoulder orientation at 10 Hz, and a LENA recorder whose audio is classified into speaker-type segments. After fusing the two streams, 21,847 attendance-confirmed child-minutes are used for the statistics.</p>
+<h2>Pipeline</h2>
+<pre>UWB (10 Hz) ─► displacement, teacher distance, spatial groups (Dominant Sets) ─┐
+                                                                             ├─► join per (child, minute)
+LENA audio  ─► adult words, overlap, utterances per minute ──────────────────┘
+   ─► room-level mean (≥ 3 children) ─► Yeo-Johnson ─► GMM, stability-aware K ─► LMM per context</pre>
+<ul>
+<li><b>Spatial groups.</b> Children who are simultaneously close and mutually body-oriented are grouped with the Dominant Sets framework, on the product of a proximity term (σ = 0.5 m) and a mutual-orientation term.</li>
+<li><b>Room-level features.</b> Four features shared by everyone in the room are averaged over the children present each minute: adult word count, auditory overlap, cumulative displacement and teacher distance. The behavioural outcomes are kept out of the clustering to avoid circularity.</li>
+<li><b>Context discovery.</b> A full-covariance Gaussian Mixture Model on Yeo-Johnson transformed features, with the number of contexts chosen by a stability-aware BIC rule.</li>
+<li><b>Inference.</b> A linear mixed model with a random intercept per child, with per-context Wald contrasts between HL and TH children, Mann-Whitney U tests on a homophily index, and Benjamini-Hochberg false discovery rate correction within each marker.</li>
+</ul>
+<h3>Choosing the number of contexts</h3>
+<figure><img src="/img/thesis_k_selection_bic.png" alt="Mean BIC and mean pairwise ARI for K from 2 to 20, with K = 6 selected" loading="lazy"><figcaption>Twenty GMMs with different seeds for each K. Top: mean BIC. Bottom: agreement between the twenty partitions (mean pairwise ARI), with the 0.80 admissibility threshold.</figcaption></figure>
+<p>BIC alone keeps finding shallow minima that reflect fitting noise. So a value of K is admissible only if its partition reproduces across random initialisations (mean pairwise ARI of at least 0.80), and the admissible K with the lowest mean BIC is chosen. That gives K = 6. K = 7 has a marginally lower BIC but does not reproduce across seeds (ARI 0.69).</p>
+<h2>Recovered activity contexts</h2>
+<figure><img src="/img/thesis_env_context_profiles.png" alt="Bar chart of the four room-level features for each of the six contexts" loading="lazy"><figcaption>Sensor profile of each context, with each feature rescaled to [0, 1] across the six contexts. Cluster numbers follow increasing adult word count.</figcaption></figure>
+<div class="table-wrap"><table>
+<tr><th>Cluster</th><th>Descriptive label</th><th>Share of time</th><th>Sensor signature</th></tr>
+<tr><td>0</td><td>Dispersed transition</td><td>6.9%</td><td>Least adult speech, most movement, teacher furthest away (9.4 m)</td></tr>
+<tr><td>1</td><td>Peer-driven activity</td><td>6.0%</td><td>Little adult speech, high overlap, teacher at a distance (4.2 m)</td></tr>
+<tr><td>2</td><td>Independent / parallel work</td><td>8.6%</td><td>Quietest room, fewest utterances</td></tr>
+<tr><td>3</td><td>Adult-scaffolded peer activity</td><td>33.9%</td><td>Peer speech dominates while a teacher stays close (2.1 m)</td></tr>
+<tr><td>4</td><td>Seated guided work</td><td>9.8%</td><td>High adult speech, least movement, teacher at 1.6 m</td></tr>
+<tr><td>5</td><td>Whole-class instruction / read-aloud</td><td>34.8%</td><td>Most adult speech (66 words per minute), teacher closest</td></tr>
+</table></div>
+<p>The labels are post-hoc descriptions of the sensor profiles and are not validated against a coded ground truth; all tests are run on cluster numbers. The six contexts are qualitatively consistent with an independent manual coding of the routine, which was consulted only after K was fixed.</p>
+<h2>Findings</h2>
+<h3>Peer co-presence</h3>
+<figure><img src="/img/thesis_avg_time_group.png" alt="Bar chart of the percentage of each minute spent in a spatial group, by context and hearing status" loading="lazy"><figcaption>Share of each minute spent in a spatial group, by context and hearing status, with 95% confidence intervals over children.</figcaption></figure>
+<p>The difference changes sign between contexts. HL children are in groups more than TH children during independent work (+7.8% of the minute, d = +1.59, q &lt; 0.0001), and less during peer-driven activity (−4.3%, q = 0.02) and seated guided work (−5.3%, q = 0.002). Pooled over the day the two groups look the same (38.8% against 39.9%), because these effects cancel out.</p>
+<h3>Vocal participation</h3>
+<figure><img src="/img/thesis_avg_utt_count.png" alt="Bar chart of utterances per minute by context and hearing status" loading="lazy"><figcaption>Child utterances per minute, by context and hearing status, with 95% confidence intervals over children.</figcaption></figure>
+<p>HL children speak less in the contexts where fast peer talk dominates and adult scaffolding is reduced: peer-driven activity (q = 0.034) and adult-scaffolded peer activity (q = 0.048), with dispersed transition in the same direction but marginal. Where adult speech dominates or the room is quiet, the gap is small and not significant.</p>
+<h3>Peer affiliation</h3>
+<figure><img src="/img/thesis_group_demographic.png" alt="Bar charts of time in HL-only, TH-only and mixed groups for TH and HL children by context" loading="lazy"><figcaption>How grouped time is split between HL-only, TH-only and mixed groups, for TH children (left) and HL children (right).</figcaption></figure>
+<p>The most consistent asymmetry. TH children's grouped time is concentrated in TH-only groups, while HL children spend more grouped time in mixed groups than TH children in all six contexts, significantly in four. The class composition alone (6 HL, 7 TH) gives TH children a homophily advantage of about 0.08; in the four significant contexts the observed gap is 0.12 to 0.19.</p>
+<h2>What it shows</h2>
+<p>Conditioning on context reveals effects that a whole-day comparison averages away. The per-child random intercept matters for the same reason: a simpler ANOVA would report no effect of hearing status on vocal participation, while the mixed model shows that the signal is concentrated in specific contexts. The results were presented to developmental psychologists, who were interested in what the findings mean for classroom practice.</p>
+<h2>Limitations</h2>
+<ul>
+<li>A single classroom with 13 children; the contexts and effect directions need replication across sites.</li>
+<li>Orientation comes from the shoulders, not gaze, so group membership carries some measurement error.</li>
+<li>The markers are proxies: they indicate exclusion risk, not whether a child's bids for interaction are taken up.</li>
+</ul>
+<h2>Data access</h2>
+<p>The recordings are child-worn audio and indoor tracking of minors, collected under a research-ethics protocol that does not permit public release. The repository contains the analysis pipeline only. Three months into the project the originally planned data became unavailable, so I defined a new research question and designed this pipeline for it.</p>
 
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>MSc thesis, TU Delft, 2026</dd></div><div><dt>Supervision</dt><dd>Socially Perceptive Computing Lab, TU Delft, with external supervision from the University of Miami</dd></div><div><dt>Stack</dt><dd>Python, pandas, NumPy, SciPy, scikit-learn, statsmodels</dd></div></dl>
+    <dl><div><dt>Type</dt><dd>MSc thesis, TU Delft, 2026</dd></div><div><dt>Supervision</dt><dd>Hayley Hung and Stephanie Tan (Socially Perceptive Computing Lab, TU Delft); Daniel Messinger (University of Miami)</dd></div><div><dt>Data</dt><dd>13 children (6 with hearing loss, 7 typically hearing), 13 recording days</dd></div><div><dt>Stack</dt><dd>Python, pandas, NumPy, SciPy, scikit-learn, statsmodels, matplotlib</dd></div></dl>
     <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Activity_Contexts_Clustering">Code ↗</a></div>
   </aside>
 </div>
