@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Can a panel of language models that learn from each other&#x27;s annotations label creative thinking in meetings more consistently?">
+<meta name="description" content="Do language models annotate more consistently when they can see how their peers annotated? A panel of LLMs labelling creative thinking in real meeting transcripts.">
 <title>LLM annotation panel | Shreya Sebastian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
     <a class="crumb" href="/projects/">← All projects</a>
     <p class="eyebrow">Group research project · TU Delft</p>
     <h1>LLM annotation panel</h1>
-    <p class="summary">Can a panel of language models that learn from each other&#x27;s annotations label creative thinking in meetings more consistently?</p>
+    <p class="summary">Do language models annotate more consistently when they can see how their peers annotated? A panel of LLMs labelling creative thinking in real meeting transcripts.</p>
     
   </div>
 </header>
@@ -32,22 +32,32 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>This project researches creativity annotation in real meeting transcripts with a panel of large language models, inspired by panel-of-experts and active learning set-ups. Four models (GPT, Gemini, Mistral and Llama via Groq) label transcripts from the QMSum dataset against a fixed codebook of eight creative-thinking types, each with a definition and an example.</p>
+<p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before, in the spirit of a panel of experts that calibrates over time.</p>
 <h2>Set-up</h2>
 <ul>
-<li><b>Two conditions.</b> In the baseline, each model annotates on its own. In the feedback condition, the other models' previous annotations are injected into the prompt as few-shot examples.</li>
-<li><b>Prompts.</b> Built from the codebook and requesting pure JSON output, which is parsed and checked before scoring.</li>
-<li><b>Agreement.</b> Scored with pairwise F1 between models over repeated runs.</li>
-<li><b>Statistics.</b> The conditions were compared with paired t-tests after Shapiro-Wilk normality checks.</li>
+<li><b>Data.</b> 232 meeting transcripts from the QMSum dataset (academic, committee and product meetings). Speech-recognition markup is cleaned and the first 100 speaker turns of each meeting are kept.</li>
+<li><b>Codebook.</b> Eight types of creative thinking, each with a definition and an example: divergent thinking, convergent thinking, fluency, flexibility, elaboration, associative leap, contextual sensitivity and problem recognition.</li>
+<li><b>Prompt.</b> Each model gets an expert-annotator instruction, the codebook and the transcript, and must return pure JSON: a list of exact transcript passages, each with a creative type.</li>
+<li><b>Two conditions.</b> In each iteration a new transcript is drawn and every model annotates it twice. In the baseline condition it works alone. In the feedback condition its prompt also contains the other two models' annotations of the previous transcript, as few-shot examples.</li>
+<li><b>Runs.</b> Five independent runs of about forty iterations each.</li>
 </ul>
-<h2>What it showed</h2>
-<p>The main lesson was that agreement is not accuracy: a panel can converge on the same wrong label. An automated annotator needs a small human-verified set to calibrate against before it is trusted at scale.</p>
-<h2>Code</h2>
-<p>The pipeline is modular: preprocessing of the transcripts, the iterative annotation experiment, post-processing into structured results with agreement scores, aggregation and plots over runs, and a separate statistical analysis script. New models can be added to the panel by registering a wrapper.</p>
+<h2>Measuring agreement</h2>
+<p>Each annotated passage is located in the transcript by an exact word-sequence match. Two annotations agree when they carry the same label and their word spans overlap. True positives, false positives and false negatives are summed over every pair of models, giving one micro-averaged F1 per iteration and condition. The conditions are compared with a paired t-test after Shapiro-Wilk normality checks, and Kendall's tau tests for a trend over iterations.</p>
+<h2>Results</h2>
+<figure><img src="/img/llm_panel_f1.png" alt="Line chart of pairwise F1 per iteration for the baseline and feedback conditions" loading="lazy"><figcaption>Agreement between the models (pairwise F1) per iteration, averaged over the five runs.</figcaption></figure>
+<div class="table-wrap"><table>
+<tr><th></th><th>Baseline</th><th>Feedback</th></tr>
+<tr><td>Mean pairwise F1</td><td>0.185</td><td>0.216</td></tr>
+<tr><td>Iterations where the condition scored higher</td><td>11 of 39</td><td>28 of 39</td></tr>
+</table></div>
+<p>Seeing their peers' annotations made the models agree more (paired t-test, t(38) = 4.20, p &lt; 0.001), and the gain held in four of the five runs. Agreement did not trend up or down over the iterations in either condition, so the effect comes from the examples in the prompt rather than from a gradual drift.</p>
+<p>Agreement is not accuracy, though: a panel can converge on the same wrong label. An automated annotator like this needs a small human-verified set to calibrate against before it is trusted at scale.</p>
+<h2>My part</h2>
+<p>I wrote the experiment loop that runs the panel over the iterations and both conditions and passes the previous annotations around, and most of the prompt definitions. Other team members built the model wrappers, preprocessing, the agreement metric, the plots and the statistical analysis.</p>
 
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>Group research project, TU Delft</dd></div><div><dt>Models</dt><dd>GPT, Gemini, Mistral, Llama via Groq</dd></div><div><dt>Data</dt><dd>QMSum meeting transcripts</dd></div><div><dt>Licence</dt><dd>MIT</dd></div></dl>
+    <dl><div><dt>Type</dt><dd>Group research project, TU Delft</dd></div><div><dt>My part</dt><dd>The iterative experiment loop and the annotation prompts</dd></div><div><dt>Models</dt><dd>Llama 3.3 70B (via Groq), GPT-4.1, Gemini 2.5 Pro</dd></div><div><dt>Data</dt><dd>QMSum meeting transcripts</dd></div><div><dt>Licence</dt><dd>MIT</dd></div></dl>
     <div class="actions"><a class="btn primary small" href="https://github.com/maros02/SSP_Creativity">Code ↗</a></div>
   </aside>
 </div>

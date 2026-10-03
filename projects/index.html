@@ -48,12 +48,12 @@
   </div>
 </article>
 <article class="card" data-kind="research ml">
-  
+  <div class="thumb fig"><img src="/img/llm_panel_f1.png" alt="Line chart of agreement F1 per iteration for the baseline and feedback conditions" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Group research project · TU Delft</span>
     <h3><a href="/projects/llm-annotation-panel/">LLM annotation panel</a></h3>
-    <p>Four LLMs label meeting transcripts against a codebook of creative-thinking types, with and without seeing each other&#x27;s previous annotations.</p>
-    <ul class="tags"><li>LLMs</li><li>Evaluation</li><li>Statistics</li></ul>
+    <p>A panel of LLMs labels meeting transcripts against a codebook of creative-thinking types; showing each model its peers&#x27; earlier annotations raised agreement between them.</p>
+    <ul class="tags"><li>LLMs</li><li>Prompting</li><li>Evaluation</li><li>Statistics</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
@@ -62,8 +62,8 @@
   <div class="card-body">
     <span class="kicker">BSc thesis · Leiden University</span>
     <h3><a href="/projects/bsc-thesis/">3D CNNs for pollen classification</a></h3>
-    <p>Compared 3D CNNs on raw pollen Z-stacks with 2D projections of the same data, reaching 95 percent test accuracy.</p>
-    <ul class="tags"><li>PyTorch</li><li>Computer vision</li><li>Bioinformatics</li></ul>
+    <p>Classified Urticaceae pollen from whole microscope Z-stacks with 3D CNNs; a ResNet3D trained on the full stack reached 95 percent test accuracy.</p>
+    <ul class="tags"><li>PyTorch</li><li>3D CNNs</li><li>Computer vision</li><li>Bioinformatics</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article></div></div><div class="group"><h2>Engineering</h2><div class="grid-auto"><article class="card" data-kind="engineering data">
@@ -77,12 +77,12 @@
   </div>
 </article>
 <article class="card" data-kind="engineering coursework">
-  
+  <div class="thumb fig"><img src="/img/sensor_poc_architecture.png" alt="Architecture diagram: sensors with local buffers send HTTP requests to an ingestion server, message queue and consumer" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Software Architecture · TU Delft</span>
     <h3><a href="/projects/sensor-ingestion/">Fault-tolerant sensor ingestion</a></h3>
-    <p>A RabbitMQ ingestion pipeline where sensors buffer data during network outages and resynchronise on reconnection, tested under failures and load.</p>
-    <ul class="tags"><li>RabbitMQ</li><li>FastAPI</li><li>Docker</li><li>pytest</li></ul>
+    <p>A proof of concept for a smart home: sensors buffer readings during network outages and resynchronise in chunks, behind a FastAPI and RabbitMQ ingestion service with GitLab CI.</p>
+    <ul class="tags"><li>FastAPI</li><li>RabbitMQ</li><li>Docker</li><li>GitLab CI</li><li>pytest</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
@@ -96,12 +96,12 @@
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article></div></div><div class="group"><h2>Course and side projects</h2><div class="grid-auto"><article class="card" data-kind="ml coursework">
-  
+  <div class="thumb"><img src="/img/dl_repro_output.png" alt="An underwater photo of a diver: raw input, reference and the model&#x27;s enhanced output" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Deep Learning · TU Delft</span>
     <h3><a href="/projects/deep-learning-reproduction/">Deep learning paper reproduction</a></h3>
-    <p>Reproduced a multi-view underwater image enhancement paper and wrote up what did and did not replicate.</p>
-    <ul class="tags"><li>PyTorch</li><li>Computer vision</li></ul>
+    <p>Reimplemented a multi-view underwater image enhancement network in PyTorch from its paper and reported what did and did not replicate.</p>
+    <ul class="tags"><li>PyTorch</li><li>Computer vision</li><li>Image enhancement</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
@@ -110,18 +110,18 @@
   <div class="card-body">
     <span class="kicker">Personal project</span>
     <h3><a href="/projects/ar-gestures/">AR gestures</a></h3>
-    <p>A browser demo that recognises hand gestures in real time and anchors particle effects to the palm.</p>
-    <ul class="tags"><li>JavaScript</li><li>MediaPipe</li><li>Canvas</li></ul>
+    <p>A browser demo that recognises five hand gestures in real time from MediaPipe landmarks and anchors particle effects to the palm.</p>
+    <ul class="tags"><li>JavaScript</li><li>MediaPipe</li><li>Canvas 2D</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>
 <article class="card" data-kind="data">
   
   <div class="card-body">
-    <span class="kicker">Group project</span>
-    <h3><a href="/projects/earthquake-map/">Global earthquake map</a></h3>
-    <p>An interactive web map of global earthquake records, with a Python pipeline that converts tabular data to GeoJSON.</p>
-    <ul class="tags"><li>JavaScript</li><li>Python</li><li>GeoJSON</li></ul>
+    <span class="kicker">Data Visualisation · TU Delft</span>
+    <h3><a href="/projects/earthquake-map/">Earthquake visualizer</a></h3>
+    <p>An interactive visualisation of significant earthquakes and tsunamis with a linked map, timeline, scatterplot and detail view; I built the timeline.</p>
+    <ul class="tags"><li>D3</li><li>OpenLayers</li><li>JavaScript</li><li>Vite</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article></div></div>

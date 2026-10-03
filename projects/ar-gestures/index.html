@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Real-time hand tracking in the browser that maps five gestures to visual effects anchored to the palm.">
+<meta name="description" content="Real-time hand tracking in the browser that maps five gestures to elemental effects anchored to the palm, with no build step and nothing to install.">
 <title>AR gestures | Shreya Sebastian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
     <a class="crumb" href="/projects/">← All projects</a>
     <p class="eyebrow">Personal project</p>
     <h1>AR gestures</h1>
-    <p class="summary">Real-time hand tracking in the browser that maps five gestures to visual effects anchored to the palm.</p>
+    <p class="summary">Real-time hand tracking in the browser that maps five gestures to elemental effects anchored to the palm, with no build step and nothing to install.</p>
     
   </div>
 </header>
@@ -32,16 +32,27 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>An augmented reality demo that runs entirely in the browser. MediaPipe Hands provides hand landmarks from the webcam in real time, the gesture is recognised from those landmarks, and a particle effect is rendered on a canvas overlay that follows the palm.</p>
+<p>An augmented reality demo that runs entirely in the browser from the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time; the gesture is recognised from those landmarks, and an effect is drawn on a canvas overlay that follows the hand.</p>
 <div class="table-wrap"><table>
 <tr><th>Gesture</th><th>Effect</th></tr>
-<tr><td>Open palm</td><td>Wind</td></tr>
-<tr><td>Fist</td><td>Earth</td></tr>
-<tr><td>Index finger up</td><td>Lightning</td></tr>
-<tr><td>Pinch</td><td>Ice</td></tr>
-<tr><td>Peace sign</td><td>Fire</td></tr>
+<tr><td>Open palm</td><td>Wind: particles orbiting the palm on three elliptical rings</td></tr>
+<tr><td>Fist</td><td>Earth: rotating rocks and falling dust</td></tr>
+<tr><td>Index finger up</td><td>Lightning: branching bolts from the fingertip</td></tr>
+<tr><td>Pinch</td><td>Ice: orbiting snowflakes and expanding ripples</td></tr>
+<tr><td>Peace sign</td><td>Fire: rising flame particles</td></tr>
 </table></div>
-<p>A gesture has to be held briefly before its effect starts. There is no build step and nothing to install.</p>
+<h2>Recognising gestures</h2>
+<ul>
+<li>A finger counts as raised when its tip is above its middle joint. Pinch is checked first, as a small distance between the thumb tip and the index tip.</li>
+<li>The other gestures follow from which fingers are raised: all four for an open palm, index and middle for peace, only the index for pointing, none for a fist.</li>
+<li>To avoid flicker, the label is a majority vote over the last five frames, and a gesture has to hold for 300 ms before its effect starts.</li>
+</ul>
+<h2>Rendering</h2>
+<ul>
+<li>Effects are anchored to the centre of the palm (lightning to the index fingertip) and scale with the size of the hand in the image, so they look the same close to the camera or far away.</li>
+<li>Each element is a small particle system with its own update and draw step: fire uses short-lived particles with velocity damping, lightning regenerates a recursive midpoint-displacement bolt several times a second, and ice draws its snowflakes procedurally.</li>
+<li>The frame time step is capped, dead particles are removed every frame and effect objects are reused, which keeps the animation smooth.</li>
+</ul>
 
   </article>
   <aside class="p-side">
@@ -49,7 +60,7 @@
     <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/AR-Gestures">Code ↗</a></div>
   </aside>
 </div>
-<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/deep-learning-reproduction/"><span>← Previous</span><b>Deep learning paper reproduction</b></a><a class="right" href="/projects/earthquake-map/"><span>Next →</span><b>Global earthquake map</b></a></div></nav>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/deep-learning-reproduction/"><span>← Previous</span><b>Deep learning paper reproduction</b></a><a class="right" href="/projects/earthquake-map/"><span>Next →</span><b>Earthquake visualizer</b></a></div></nav>
 
 </main>
 <footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>

@@ -32,18 +32,31 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>A team of four reproduced a published method for underwater image enhancement that fuses several pre-processed views of the same image, such as white-balanced and contrast-enhanced (CLAHE) versions, inside the network.</p>
-<h2>My part</h2>
+<p>Underwater photos lose colour and contrast because water absorbs and scatters light. The paper we reproduced enhances them with a network that fuses several versions of the same image. There was no public code, so we rebuilt the method from the paper's description and trained it on the UIEB benchmark.</p>
+<h2>Inputs</h2>
+<figure><img src="/img/dl_repro_views.jpg" alt="Grid of underwater images: raw, white-balanced, contrast-enhanced and reference versions" loading="lazy"><figcaption>From top to bottom: raw images, the white-balanced view, the contrast-enhanced (CLAHE) view and the reference images.</figcaption></figure>
+<p>Each raw image is turned into three views: the original, a white-balanced version and a contrast-enhanced version (CLAHE on the lightness channel). Images are resized to 256 × 256, and the 890 image pairs are split 85/15 into training and test sets.</p>
+<h2>The model I built</h2>
 <ul>
-<li>Built the model architecture.</li>
-<li>Contributed to data preprocessing.</li>
-<li>Wrote the technical blog post on what did and did not replicate.</li>
+<li><b>Residual enhancement modules.</b> Each view first passes through its own stack of residual blocks.</li>
+<li><b>Multi-feature fusion.</b> Fusion modules combine the views with 1 × 1, 3 × 3 and 5 × 5 convolutions and residual connections.</li>
+<li><b>Multi-scale attention.</b> Features are produced at three scales, and same-scale features are combined with a channel attention module that learns how much to weight each view.</li>
+<li><b>Reconstruction.</b> Further residual stages and upsampling produce the enhanced image.</li>
 </ul>
-<p>Other team members built the training loop and loss function, the evaluation metrics and inference, and the white balance and CLAHE functions.</p>
+<p>Training used an L1 loss plus a perceptual loss on VGG-16 features, with Adam, for about 12 hours on a single GPU.</p>
+<h2>Where the paper was ambiguous</h2>
+<ul>
+<li>Channel counts between modules were not specified, so we added 1 × 1 convolutions to match them.</li>
+<li>Parts of the architecture figure were open to interpretation; we implemented them as shared-kernel convolutions with downsampling.</li>
+<li>The channel shuffle step was left out, as its backward pass was not available in PyTorch.</li>
+</ul>
+<h2>What replicated</h2>
+<figure><img src="/img/dl_repro_output.png" alt="Diver image: raw input, reference and model output" loading="lazy"><figcaption>Raw input, reference and our model's output.</figcaption></figure>
+<p>The enhanced images come out visually close to the references. The quantitative scores did not line up with the paper's: PSNR and SSIM came out lower than reported, while two no-reference metrics came out far higher, which pointed to differences in how the metrics were evaluated rather than to the model alone. The write-up recommends a separate validation set for model selection and testing on a second dataset.</p>
 
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>Group project, Deep Learning course (CS4240), TU Delft</dd></div><div><dt>My role</dt><dd>Model architecture, data preprocessing, blog post</dd></div></dl>
+    <dl><div><dt>Type</dt><dd>Team of four, Deep Learning course (CS4240), TU Delft</dd></div><div><dt>My part</dt><dd>Model architecture, data preprocessing, blog post</dd></div><div><dt>Data</dt><dd>UIEB underwater image benchmark (890 image pairs)</dd></div><div><dt>Stack</dt><dd>Python, PyTorch, OpenCV, Kaggle GPU</dd></div></dl>
     <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Deep_Learning_Reproduction_Project">Code ↗</a></div>
   </aside>
 </div>

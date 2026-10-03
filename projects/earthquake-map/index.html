@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="An interactive web map of global earthquake records.">
-<title>Global earthquake map | Shreya Sebastian</title>
+<meta name="description" content="An interactive web visualisation of significant earthquakes and tsunamis, in which a map, a timeline, a scatterplot and a detail panel filter each other.">
+<title>Earthquake visualizer | Shreya Sebastian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
@@ -22,9 +22,9 @@
 <header class="p-hero">
   <div class="container">
     <a class="crumb" href="/projects/">← All projects</a>
-    <p class="eyebrow">Group project</p>
-    <h1>Global earthquake map</h1>
-    <p class="summary">An interactive web map of global earthquake records.</p>
+    <p class="eyebrow">Data Visualisation · TU Delft</p>
+    <h1>Earthquake visualizer</h1>
+    <p class="summary">An interactive web visualisation of significant earthquakes and tsunamis, in which a map, a timeline, a scatterplot and a detail panel filter each other.</p>
     
   </div>
 </header>
@@ -32,12 +32,28 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>A web-based interactive map of global earthquake records, developed together with a teammate. A Python preprocessing pipeline converts the tabular earthquake data to GeoJSON, which the map then loads and displays.</p>
+<p>The application lets people explore historical records of significant earthquakes and the tsunamis they caused. Four views are linked, so a selection in any of them filters the others:</p>
+<ul>
+<li><b>World map.</b> Earthquakes as points over tectonic plate boundaries, with size and colour mapped to attributes such as magnitude, depth, intensity, deaths or damage, and a heatmap mode.</li>
+<li><b>Timeline.</b> When earthquakes happened, for choosing a period.</li>
+<li><b>Scatterplot.</b> Any two attributes against each other, magnitude against focal depth by default.</li>
+<li><b>Detail view.</b> The full record of one earthquake and any tsunamis it caused.</li>
+</ul>
+<p>Preset points of interest lead into notable patterns, such as low-magnitude earthquakes that caused a lot of damage, and a filter restricts every view to earthquakes that caused a tsunami.</p>
+<h2>My part: the timeline</h2>
+<p>The records span several thousand years and are very unevenly distributed, so a simple histogram over time does not work. I built the timeline as a grid: rows are ranges of years, columns are months, and each cell is coloured by the number of earthquakes.</p>
+<ul>
+<li>The year ranges adapt to the data, and selecting a range zooms into it with finer ranges; a back button returns to the previous level, including for periods with sparse records.</li>
+<li>Dragging a box over cells selects a timeframe, highlights the cells and filters the map, scatterplot and detail view to the selected earthquakes.</li>
+<li>Many historical records have no month, so they get their own column instead of being dropped.</li>
+</ul>
+<h2>Data</h2>
+<p>The earthquake and tsunami records were exported as tab-separated files and converted to GeoJSON with a small Python script that keeps every row with valid coordinates as a point feature.</p>
 
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>Group project</dd></div><div><dt>Stack</dt><dd>JavaScript, Python, GeoJSON</dd></div></dl>
-    <div class="actions"><a class="btn primary small" href="https://github.com/WouterButhker/Earthquakes">Code ↗</a></div>
+    <dl><div><dt>Type</dt><dd>Team of four, Data Visualisation course, TU Delft, 2024/2025</dd></div><div><dt>My part</dt><dd>The timeline view and its linking to the other views</dd></div><div><dt>Data</dt><dd>6,393 significant earthquakes and 2,512 tsunamis</dd></div><div><dt>Stack</dt><dd>JavaScript, D3, OpenLayers, Vite, Python</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Earthquakes">Code ↗</a></div>
   </aside>
 </div>
 <nav class="next" aria-label="More projects"><div class="container"><a href="/projects/ar-gestures/"><span>← Previous</span><b>AR gestures</b></a></div></nav>
