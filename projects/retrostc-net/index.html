@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Can an event that happens after learning decide whether a network keeps what it learned? Retroactive consolidation for neural networks, based on synaptic tagging and capture.">
+<title>RetroSTC-Net | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">Research · open source</p>
+    <h1>RetroSTC-Net</h1>
+    <p class="summary">Can an event that happens after learning decide whether a network keeps what it learned? Retroactive consolidation for neural networks, based on synaptic tagging and capture.</p>
+    
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<h2>Background</h2>
+<p>According to the synaptic tagging and capture (STC) hypothesis (Frey and Morris, 1997), learning first causes a short-lived synaptic change and leaves a temporary tag. The change becomes permanent only if plasticity-related products arrive while the tag is still present, and these can be triggered by a separate salient event. Behaviourally, a novel experience shortly before or after weak learning makes the weak memory last.</p>
+<p>This project implements that mechanism in standard backprop-trained networks, tests whether the behavioural-tagging time window appears, and uses the network's own consolidation record as an explanation of what it remembers.</p>
+<h2>Contribution</h2>
+<p>Related mechanisms exist, such as a decaying weight component with tag-and-capture against forgetting (Leimer, Herzog and Senn, 2019) and retroactive STC in spiking networks (Lehr, Luboeinski and Tetzlaff, 2022). What this project adds:</p>
+<ul>
+<li>consolidation in a backprop-trained network that is decided retroactively, by a salience event occurring after learning;</li>
+<li>a behavioural-tagging time-window test in network weights, including rescue of one task by another;</li>
+<li>a consolidation log that explains what the network retained, validated with a faithfulness test.</li>
+</ul>
+<h2>Method</h2>
+<p>Each weight is split into a consolidated part <code>L</code> and a labile part <code>E</code>, with effective weight <code>w = L + E</code>. The optimiser updates <code>w</code> as usual; after each step:</p>
+<div class="table-wrap"><table>
+<tr><th>Biology</th><th>Network</th></tr>
+<tr><td>Early-phase LTP decays</td><td><code>E ← E · exp(−1/τE)</code></td></tr>
+<tr><td>Synaptic tag</td><td><code>h ← h · exp(−1/τh) + |Δw|</code></td></tr>
+<tr><td>Plasticity-related products, shared per neuron</td><td><code>p ← p · exp(−1/τp) + α·s(t)</code></td></tr>
+<tr><td>Capture</td><td><code>c = clamp(κ · p · [h &gt; θ], 0, 1)</code>, then <code>L += c·E</code>, <code>E −= c·E</code></td></tr>
+<tr><td>Salient event</td><td><code>s(t)</code>: a pulse, or a sudden jump in training loss</td></tr>
+</table></div>
+<p>Labile change is tracked per learning episode, so every consolidated change can be traced to the task that produced it and the event that captured it.</p>
+<h2>Results</h2>
+<p>Unless stated otherwise: an MLP with two hidden layers of 256 units, SGD, two binary MNIST tasks (A: 3 vs 5, B: 4 vs 9) and five seeds. Each run ends with 4000 steps without learning, so only consolidated memory remains.</p>
+<h3>Event timing determines what is kept</h3>
+<figure><img src="/img/retrostc.png" alt="Share of task A consolidated and task A accuracy against the time of the salient event" loading="lazy"><figcaption>Share of task A that became permanent, by the time of a single salient event relative to the end of task A.</figcaption></figure>
+<p>Without an event nothing is kept, and accuracy on A falls from 0.95 to 0.61 after the delay; near the event it stays at about 0.95. The two sides of the window have separate causes, as STC predicts: tag lifetime shifts only the after-side, and the lifetime of the plasticity-related products shifts only the before-side.</p>
+<h3>Cross-task rescue</h3>
+<figure><img src="/img/retrostc_cross_task.png" alt="Cross-task rescue results for different gaps between task A and task B" loading="lazy"></figure>
+<p>When task B's onset is salient, it rescues task A retroactively; without salience neither task is kept. With one tag per weight, B's own learning re-tags weights shared with A, so binding each episode's change to its own tag is needed for a clean window.</p>
+<h3>The consolidation log as an explanation</h3>
+<figure><img src="/img/retrostc_faithfulness.png" alt="Deletion test comparing the consolidation log, Fisher importance and random selection" loading="lazy"></figure>
+<p>Faithfulness is tested by deletion: parameters are ranked by the log's attribution, by Fisher importance or at random, and the top-ranked ones are reset to their pre-learning values. Removing the 5% of parameters the log attributes to task A drops accuracy on A from 0.87 to 0.80 while sparing B; removing B's drops B from 0.97 to 0.69 while sparing A. Fisher importance separates the two memories far less clearly.</p>
+<h3>Forgetting on Split-MNIST</h3>
+<figure><img src="/img/retrostc_splitmnist.png" alt="Split-MNIST accuracy for plain SGD, EWC, Synaptic Intelligence and STC variants" loading="lazy"></figure>
+<div class="table-wrap"><table>
+<tr><th>Method</th><th>Task-incremental</th><th>Domain-incremental</th></tr>
+<tr><td>Plain SGD</td><td>0.980</td><td>0.616</td></tr>
+<tr><td>EWC</td><td>0.987</td><td>0.637</td></tr>
+<tr><td>Synaptic Intelligence</td><td>0.987</td><td>0.657</td></tr>
+<tr><td>STC, surprise-gated</td><td>0.980</td><td>0.621</td></tr>
+<tr><td>STC log as importance, surprise-gated</td><td>0.980</td><td>0.636</td></tr>
+</table></div>
+<p>STC alone barely reduces forgetting: it decides what becomes permanent, but consolidated weights are not protected from later learning. Using the consolidation log as importance in an EWC-style penalty reaches EWC level, with importance selected by surprising events after learning rather than fixed during it. It does not outperform Synaptic Intelligence.</p>
+<h2>Limitations</h2>
+<ul>
+<li>Small MLPs on MNIST only; the results demonstrate the mechanism, not performance at scale.</li>
+<li>Time is measured in training steps, and time constants were set by hand.</li>
+<li>The biological mapping is simplified: backprop is not a biological learning rule, and a hidden unit is not a neuron.</li>
+</ul>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>Personal research project</dd></div><div><dt>Released</dt><dd>September 2026</dd></div><div><dt>Stack</dt><dd>Python, PyTorch</dd></div><div><dt>Licence</dt><dd>MIT</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/RetroSTC-Net">Code ↗</a></div>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/tech-jobs-radar/"><span>← Previous</span><b>Tech Jobs Radar</b></a><a class="right" href="/projects/msc-thesis/"><span>Next →</span><b>Social inclusion from sensor data</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Discovering latent interaction contexts from multimodal behavioural data for social inclusion analysis in an inclusive preschool.">
+<title>Social inclusion from sensor data | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">MSc thesis · TU Delft</p>
+    <h1>Social inclusion from sensor data</h1>
+    <p class="summary">Discovering latent interaction contexts from multimodal behavioural data for social inclusion analysis in an inclusive preschool.</p>
+    <figure class="p-figure"><canvas class="clusters" role="img" aria-label="Illustration of seven clusters of data points"></canvas></figure>
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<h2>The problem</h2>
+<p>In inclusive classrooms, the physical presence of children with hearing loss does not guarantee social inclusion with typically hearing peers. Self-report is biased, and manual observation is too labour-intensive for fine-grained, full-day coverage. Wearable sensing can record continuous co-presence and vocal activity, but the meaning of those signals depends on what the room is doing: a quiet sedentary minute and a free-play minute are not comparable.</p>
+<p>The thesis therefore turns continuous sensor streams into child-minute rows labelled with an activity context, and tests inclusion within each context.</p>
+<h2>Research questions</h2>
+<div class="callout"><p><b>RQ1.</b> Can interpretable latent activity contexts be recovered from fused ultra-wideband (UWB) spatial data and LENA acoustic data using unsupervised clustering?</p>
+<p><b>RQ2.</b> Within each context, do children with and without hearing loss differ on three sensor-derivable markers of inclusion: peer co-presence, vocal participation rate and peer affiliation patterns?</p></div>
+<h2>Pipeline</h2>
+<ul>
+<li><b>Spatial features.</b> UWB tracking at 10 Hz gives position and orientation per child. Per-frame displacement is computed, and conversational groups (F-formations) are detected with Dominant Sets clustering on a socio-spatial affinity of proximity and mutual orientation.</li>
+<li><b>Acoustic features.</b> LENA speaker-type segments are binned to one-minute epochs: adult word count, auditory overlap and utterance counts.</li>
+<li><b>Context discovery.</b> The streams are joined per child and minute, averaged at room level over four features (adult word count, auditory overlap, displacement and teacher distance), power-transformed and clustered with a full-covariance Gaussian Mixture Model. The number of components is fixed from the classroom's daily routine; assignment and profiles come from the sensor data.</li>
+<li><b>Inference.</b> Per-context linear mixed models with a random intercept per child test the hearing loss contrast on each marker, alongside Mann-Whitney U tests on per-child homophily.</li>
+</ul>
+<h2>Recovered activity contexts</h2>
+<div class="table-wrap"><table>
+<tr><th>Context</th><th>Share</th><th>Sensor signature</th></tr>
+<tr><td>Teacher-proximal group activity</td><td>~25%</td><td>High adult speech, lowest teacher distance, low movement</td></tr>
+<tr><td>Teacher-led direct instruction</td><td>~14%</td><td>Highest adult speech, low overlap</td></tr>
+<tr><td>Quiet sedentary activity</td><td>~6%</td><td>Lowest auditory overlap, few utterances</td></tr>
+<tr><td>Structured seated conversation</td><td>~10%</td><td>Near-zero displacement, moderate overlap</td></tr>
+<tr><td>Active peer interaction</td><td>~16%</td><td>High displacement, moderate teacher distance</td></tr>
+<tr><td>Free play</td><td>~22%</td><td>High overlap, moderate to high displacement</td></tr>
+<tr><td>Dispersed high-movement transition</td><td>~6%</td><td>Least adult speech, most overlap, movement and teacher distance</td></tr>
+</table></div>
+<h2>Findings</h2>
+<ul>
+<li><b>Peer co-presence.</b> No difference in most contexts; children with hearing loss were more often co-present with peers only during quiet sedentary activity.</li>
+<li><b>Vocal participation.</b> The deficit for children with hearing loss concentrated in active peer interaction, free play and transitions, the contexts with the least adult scaffolding.</li>
+<li><b>Peer affiliation.</b> The most consistent marker: children with hearing loss spent more grouped time in mixed groups than their typically hearing peers across all contexts.</li>
+</ul>
+<p>The pooled analysis across contexts showed almost no effect for peer co-presence. The effects were there, but only became visible once the analysis was conditioned on context. The results were presented to developmental psychologists, who cared about what the findings meant in practice.</p>
+<h2>Data</h2>
+<p>The dataset contains child-worn audio and indoor tracking of minors, collected under a research-ethics protocol that does not permit public release. The repository contains the analysis pipeline only.</p>
+<p>Three months into the project the originally planned data became unavailable, so I defined a new research question and designed this pipeline for it.</p>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>MSc thesis, TU Delft, 2026</dd></div><div><dt>Supervision</dt><dd>Socially Perceptive Computing Lab, TU Delft, with external supervision from the University of Miami</dd></div><div><dt>Stack</dt><dd>Python, pandas, NumPy, SciPy, scikit-learn, statsmodels</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Activity_Contexts_Clustering">Code ↗</a></div>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/retrostc-net/"><span>← Previous</span><b>RetroSTC-Net</b></a><a class="right" href="/projects/llm-annotation-panel/"><span>Next →</span><b>LLM annotation panel</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>

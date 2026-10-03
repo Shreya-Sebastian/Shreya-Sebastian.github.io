@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Can a panel of language models that learn from each other&#x27;s annotations label creative thinking in meetings more consistently?">
+<title>LLM annotation panel | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">Group research project · TU Delft</p>
+    <h1>LLM annotation panel</h1>
+    <p class="summary">Can a panel of language models that learn from each other&#x27;s annotations label creative thinking in meetings more consistently?</p>
+    
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<h2>Overview</h2>
+<p>This project researches creativity annotation in real meeting transcripts with a panel of large language models, inspired by panel-of-experts and active learning set-ups. Four models (GPT, Gemini, Mistral and Llama via Groq) label transcripts from the QMSum dataset against a fixed codebook of eight creative-thinking types, each with a definition and an example.</p>
+<h2>Set-up</h2>
+<ul>
+<li><b>Two conditions.</b> In the baseline, each model annotates on its own. In the feedback condition, the other models' previous annotations are injected into the prompt as few-shot examples.</li>
+<li><b>Prompts.</b> Built from the codebook and requesting pure JSON output, which is parsed and checked before scoring.</li>
+<li><b>Agreement.</b> Scored with pairwise F1 between models over repeated runs.</li>
+<li><b>Statistics.</b> The conditions were compared with paired t-tests after Shapiro-Wilk normality checks.</li>
+</ul>
+<h2>What it showed</h2>
+<p>The main lesson was that agreement is not accuracy: a panel can converge on the same wrong label. An automated annotator needs a small human-verified set to calibrate against before it is trusted at scale.</p>
+<h2>Code</h2>
+<p>The pipeline is modular: preprocessing of the transcripts, the iterative annotation experiment, post-processing into structured results with agreement scores, aggregation and plots over runs, and a separate statistical analysis script. New models can be added to the panel by registering a wrapper.</p>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>Group research project, TU Delft</dd></div><div><dt>Models</dt><dd>GPT, Gemini, Mistral, Llama via Groq</dd></div><div><dt>Data</dt><dd>QMSum meeting transcripts</dd></div><div><dt>Licence</dt><dd>MIT</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/maros02/SSP_Creativity">Code ↗</a></div>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/msc-thesis/"><span>← Previous</span><b>Social inclusion from sensor data</b></a><a class="right" href="/projects/bsc-thesis/"><span>Next →</span><b>3D CNNs for pollen classification</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>

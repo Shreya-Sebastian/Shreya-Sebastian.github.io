@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A proof of concept for a smart home system: sensor data keeps flowing through network outages and is resynchronised when the connection returns.">
+<title>Fault-tolerant sensor ingestion | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">Software Architecture · TU Delft</p>
+    <h1>Fault-tolerant sensor ingestion</h1>
+    <p class="summary">A proof of concept for a smart home system: sensor data keeps flowing through network outages and is resynchronised when the connection returns.</p>
+    
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<h2>Overview</h2>
+<p>This proof of concept demonstrates a fault-tolerant data ingestion architecture for IoT sensors in a smart home. Simulated sensors buffer their data locally during network outages and resynchronise in chunks when they reconnect.</p>
+<h2>Architecture</h2>
+<ul>
+<li><b>Ingestion server.</b> A FastAPI service that receives sensor readings, validates them with Pydantic and publishes them to a RabbitMQ queue.</li>
+<li><b>Consumer.</b> A separate process that consumes and processes messages from the queue.</li>
+<li><b>Sensor simulator.</b> Simulates many sensors. A disconnected sensor stores its readings locally (store-and-forward) and uploads its backlog on reconnection.</li>
+<li><b>Orchestration.</b> Docker Compose runs the server, consumer and broker together.</li>
+</ul>
+<h2>Testing</h2>
+<p>A three-phase simulation checks the behaviour end to end: normal operation, a disruption in which one sensor goes offline while the others keep sending, and resynchronisation, where the backlog is processed alongside live data.</p>
+<p>A GitLab CI pipeline runs style checks with black, builds a Docker image and pushes it to the GitLab container registry, then runs pytest suites for error handling, scalability under high-concurrency load and end-to-end behaviour inside that image against a RabbitMQ service.</p>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>Software Architecture course, TU Delft</dd></div><div><dt>Stack</dt><dd>Python, FastAPI, RabbitMQ, Pydantic, Docker, GitLab CI, pytest</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Software_Architecture_PoC">Code ↗</a></div>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/bsc-thesis/"><span>← Previous</span><b>3D CNNs for pollen classification</b></a><a class="right" href="/projects/moneytrail/"><span>Next →</span><b>Moneytrail</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Projects by Shreya Sebastian: research, machine learning, data and software engineering.">
+<title>Projects | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="page-head">
+  <div class="container">
+    <h1>Projects</h1>
+    <p>Research, engineering and course projects, from my theses to a deployed web service. Each page describes the problem, the approach and the results.</p>
+    <div class="filters" role="group" aria-label="Filter projects"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="research" aria-pressed="false">Research</button><button type="button" data-filter="engineering" aria-pressed="false">Engineering</button><button type="button" data-filter="ml" aria-pressed="false">Machine learning</button><button type="button" data-filter="data" aria-pressed="false">Data</button></div>
+  </div>
+</header>
+<div class="container" style="padding-bottom:72px">
+<div class="group"><h2>Research</h2><div class="grid-auto"><article class="card" data-kind="research ml">
+  <div class="thumb fig"><img src="/img/retrostc.png" alt="Plot of consolidation against the timing of a salient event" loading="lazy"></div>
+  <div class="card-body">
+    <span class="kicker">Research · open source</span>
+    <h3><a href="/projects/retrostc-net/">RetroSTC-Net</a></h3>
+    <p>Event-gated, retroactive consolidation of weights in neural networks, inspired by synaptic tagging and capture, with a consolidation log tested for faithfulness.</p>
+    <ul class="tags"><li>PyTorch</li><li>Continual learning</li><li>Explainability</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="research ml data">
+  <div class="thumb"><canvas class="clusters" role="img" aria-label="Illustration of seven clusters of data points"></canvas></div>
+  <div class="card-body">
+    <span class="kicker">MSc thesis · TU Delft</span>
+    <h3><a href="/projects/msc-thesis/">Social inclusion from sensor data</a></h3>
+    <p>Fused indoor positioning and audio from an inclusive preschool, recovered activity contexts with a Gaussian Mixture Model and compared children with and without hearing loss within each context.</p>
+    <ul class="tags"><li>Unsupervised learning</li><li>Mixed models</li><li>Multimodal data</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="research ml">
+  
+  <div class="card-body">
+    <span class="kicker">Group research project · TU Delft</span>
+    <h3><a href="/projects/llm-annotation-panel/">LLM annotation panel</a></h3>
+    <p>Four LLMs label meeting transcripts against a codebook of creative-thinking types, with and without seeing each other&#x27;s previous annotations.</p>
+    <ul class="tags"><li>LLMs</li><li>Evaluation</li><li>Statistics</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="research ml">
+  
+  <div class="card-body">
+    <span class="kicker">BSc thesis · Leiden University</span>
+    <h3><a href="/projects/bsc-thesis/">3D CNNs for pollen classification</a></h3>
+    <p>Compared 3D CNNs on raw pollen Z-stacks with 2D projections of the same data, reaching 95 percent test accuracy.</p>
+    <ul class="tags"><li>PyTorch</li><li>Computer vision</li><li>Bioinformatics</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article></div></div><div class="group"><h2>Engineering</h2><div class="grid-auto"><article class="card" data-kind="engineering data">
+  <div class="thumb"><img src="/img/techjobsradar.png" alt="Tech Jobs Radar overview page with skill demand charts" loading="lazy"></div>
+  <div class="card-body">
+    <span class="kicker">Live since September 2026</span>
+    <h3><a href="/projects/tech-jobs-radar/">Tech Jobs Radar</a></h3>
+    <p>A public job board that reads postings from Dutch employer career sites, classifies tech roles and extracts structured fields such as skills, seniority and visa sponsorship.</p>
+    <ul class="tags"><li>FastAPI</li><li>Postgres</li><li>Kubernetes</li><li>AWS</li><li>Terraform</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="engineering coursework">
+  
+  <div class="card-body">
+    <span class="kicker">Software Architecture · TU Delft</span>
+    <h3><a href="/projects/sensor-ingestion/">Fault-tolerant sensor ingestion</a></h3>
+    <p>A RabbitMQ ingestion pipeline where sensors buffer data during network outages and resynchronise on reconnection, tested under failures and load.</p>
+    <ul class="tags"><li>RabbitMQ</li><li>FastAPI</li><li>Docker</li><li>pytest</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="engineering data">
+  
+  <div class="card-body">
+    <span class="kicker">Personal project</span>
+    <h3><a href="/projects/moneytrail/">Moneytrail</a></h3>
+    <p>A local-first tool that reads Dutch bank CSV exports, works out who each payment went to and finds recurring payments.</p>
+    <ul class="tags"><li>Python</li><li>DuckDB</li><li>RapidFuzz</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article></div></div><div class="group"><h2>Course and side projects</h2><div class="grid-auto"><article class="card" data-kind="ml coursework">
+  
+  <div class="card-body">
+    <span class="kicker">Deep Learning · TU Delft</span>
+    <h3><a href="/projects/deep-learning-reproduction/">Deep learning paper reproduction</a></h3>
+    <p>Reproduced a multi-view underwater image enhancement paper and wrote up what did and did not replicate.</p>
+    <ul class="tags"><li>PyTorch</li><li>Computer vision</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="ml">
+  
+  <div class="card-body">
+    <span class="kicker">Personal project</span>
+    <h3><a href="/projects/ar-gestures/">AR gestures</a></h3>
+    <p>A browser demo that recognises hand gestures in real time and anchors particle effects to the palm.</p>
+    <ul class="tags"><li>JavaScript</li><li>MediaPipe</li><li>Canvas</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="data">
+  
+  <div class="card-body">
+    <span class="kicker">Group project</span>
+    <h3><a href="/projects/earthquake-map/">Global earthquake map</a></h3>
+    <p>An interactive web map of global earthquake records, with a Python pipeline that converts tabular data to GeoJSON.</p>
+    <ul class="tags"><li>JavaScript</li><li>Python</li><li>GeoJSON</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article></div></div>
+</div>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>

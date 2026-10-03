@@ -3,344 +3,119 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Shreya Sebastian, ML and data engineer. MSc Computer Science, TU Delft. Projects in machine learning, data and software engineering.">
+<meta name="description" content="Shreya Sebastian, ML and data engineer. MSc Computer Science, TU Delft.">
 <title>Shreya Sebastian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<style>
-/* Layout: sticky top nav, split hero (headline left, photo right), featured project cards with images, a denser grid of further projects, then about and contact */
-:root {
-  --bg: #fafaf7;
-  --surface: #ffffff;
-  --fg: #1a1d24;
-  --muted: #5d6270;
-  --line: #e7e6df;
-  --accent: #4152cc;
-  --accent-soft: #e6e9fb;
-  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --body: "Manrope", "Segoe UI", system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #121419; --surface: #1a1d24; --fg: #e8e9ee; --muted: #9ca1ae;
-    --line: #2a2e38; --accent: #8f9cff; --accent-soft: #252a45; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #121419; --surface: #1a1d24; --fg: #e8e9ee; --muted: #9ca1ae;
-  --line: #2a2e38; --accent: #8f9cff; --accent-soft: #252a45; color-scheme: dark;
-}
-
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 72px; }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
-img { max-width: 100%; display: block; }
-a { color: inherit; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-.container { max-width: 1080px; margin: 0 auto; padding-inline: 24px; }
-
-/* nav */
-.nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-.nav .container { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
-.logo { font-family: var(--display); font-weight: 700; font-size: 1.2rem; text-decoration: none; }
-
-.nav ul { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; font-size: 0.95rem; }
-.nav ul a { text-decoration: none; color: var(--muted); }
-.nav ul a:hover { color: var(--fg); }
-
-/* hero */
-.hero { padding-block: 80px 72px; }
-.hero .container { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 48px; align-items: center; }
-.eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin: 0 0 18px; }
-.hero h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 6.5vw, 4.4rem); line-height: 1.02; letter-spacing: -0.025em; margin: 0; text-wrap: balance; }
-.hero h1 em { font-style: normal; color: var(--accent); display: block; font-weight: 500; font-size: 0.62em; letter-spacing: -0.015em; margin-top: 12px; line-height: 1.15; }
-.hero p.lede { font-size: 1.1rem; color: var(--muted); max-width: 52ch; margin: 24px 0 32px; }
-.actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; text-decoration: none; border: 1.5px solid var(--fg); transition: transform .15s ease, background .15s ease; }
-.btn:hover { transform: translateY(-2px); }
-.btn.primary { background: var(--fg); color: var(--bg); }
-.btn.ghost:hover { background: var(--surface); }
-.portrait { width: 240px; height: 240px; border-radius: 50%; object-fit: cover; border: 6px solid var(--surface); box-shadow: 0 0 0 1px var(--line), 0 20px 40px -20px rgba(20, 24, 40, .35); }
-
-/* sections */
-section.block { padding-block: 72px; border-top: 1px solid var(--line); }
-.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 32px; }
-h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.4rem); letter-spacing: -0.02em; margin: 0; }
-.head p { margin: 0; color: var(--muted); }
-
-/* featured cards */
-.featured { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform .2s ease, box-shadow .2s ease; }
-.card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px -24px rgba(20, 24, 40, .45); }
-.thumb { aspect-ratio: 16 / 10; background: var(--accent-soft); overflow: hidden; border-bottom: 1px solid var(--line); }
-.thumb img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
-.thumb.light { background: #ffffff; }
-.thumb.light img { object-fit: contain; padding: 10px; }
-.thumb canvas { width: 100%; height: 100%; display: block; }
-.card-body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.kicker { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); }
-.card h3 { font-family: var(--display); font-weight: 700; font-size: 1.3rem; margin: 0; line-height: 1.2; }
-.card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 4px 0 0; padding: 0; }
-.tags li { font-size: 0.75rem; font-weight: 500; background: var(--accent-soft); color: var(--fg); padding: 3px 10px; border-radius: 999px; }
-.links { margin-top: auto; padding-top: 8px; display: flex; flex-wrap: wrap; gap: 16px; font-weight: 600; font-size: 0.9rem; }
-.links a { color: var(--accent); text-decoration: none; }
-.links a:hover { text-decoration: underline; text-underline-offset: 3px; }
-
-/* more projects */
-.more-title { font-family: var(--display); font-weight: 500; font-size: 1.25rem; margin: 56px 0 18px; }
-.more { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-.more .card-body { padding: 20px; }
-.more .card h3 { font-size: 1.1rem; }
-
-/* about */
-.about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; }
-.about p { margin: 0 0 16px; max-width: 60ch; }
-.facts { display: grid; gap: 28px; }
-.facts h3 { font-family: var(--mono); font-weight: 400; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0 0 12px; }
-.edu { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
-.edu li { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 12px; }
-.edu .yr { font-family: var(--mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
-.edu b { font-weight: 600; }
-.edu small { display: block; color: var(--muted); font-size: 0.88rem; }
-.skills { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
-.skills li { border: 1px solid var(--line); background: var(--surface); padding: 5px 12px; border-radius: 8px; font-size: 0.88rem; }
-
-/* contact */
-.contact-box { background: var(--fg); color: var(--bg); border-radius: 20px; padding: 48px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; }
-.contact-box h2 { color: var(--bg); }
-.contact-box p { margin: 12px 0 0; opacity: .75; max-width: 48ch; }
-.contact-links { display: grid; gap: 10px; min-width: 0; }
-.contact-links a, .contact-links .mail { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); border-radius: 10px; text-decoration: none; font-weight: 500; }
-.contact-links a:hover { background: color-mix(in srgb, var(--bg) 10%, transparent); }
-.contact-links span.k { font-family: var(--mono); font-size: 0.75rem; opacity: .65; }
-.copy { font: inherit; font-size: 0.8rem; background: transparent; color: inherit; border: 1px solid color-mix(in srgb, var(--bg) 35%, transparent); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
-
-footer { padding-block: 40px; color: var(--muted); font-size: 0.85rem; }
-
-@media (max-width: 900px) {
-  .featured { grid-template-columns: minmax(0, 1fr); }
-  .about { grid-template-columns: minmax(0, 1fr); }
-}
-@media (max-width: 720px) {
-  .container { padding-inline: 18px; }
-  .nav ul { gap: 16px; font-size: 0.9rem; }
-  .hero { padding-block: 48px; }
-  .hero .container { grid-template-columns: minmax(0, 1fr); gap: 28px; }
-  .portrait { width: 132px; height: 132px; grid-row: 1; border-width: 4px; }
-  section.block { padding-block: 56px; }
-  .contact-box { grid-template-columns: minmax(0, 1fr); padding: 28px 22px; }
-}
-@media (max-width: 420px) { .nav ul li.opt { display: none; } }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .btn, .card { transition: none; }
-  .btn:hover, .card:hover { transform: none; }
-}
-</style>
+<link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-
 <nav class="nav" aria-label="Main">
   <div class="container">
-    <a class="logo" href="#top">Shreya Sebastian</a>
-    <ul>
-      <li><a href="#projects">Projects</a></li>
-      <li class="opt"><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/" aria-current="page">About</a></li><li><a href="/projects/">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
+<main>
 
-<header class="hero" id="top">
+<header class="hero">
   <div class="container">
     <div>
       <p class="eyebrow">MSc Computer Science, TU Delft · Netherlands</p>
       <h1>ML and data engineer.<em>Currently running a live job board.</em></h1>
       <p class="lede">I recently completed an MSc in Computer Science at TU Delft and work on machine learning, data and software engineering.</p>
       <div class="actions">
-        <a class="btn primary" href="#projects">View projects</a>
-        <a class="btn ghost" href="Shreya_Sebastian_CV.pdf">Download CV</a>
+        <a class="btn primary" href="/projects/">View projects</a>
+        <a class="btn ghost" href="/Shreya_Sebastian_CV.pdf">Download CV</a>
       </div>
     </div>
-    <img class="portrait" src="profile.jpg" alt="Portrait of Shreya Sebastian" width="240" height="240">
+    <img class="portrait" src="/profile.jpg" alt="Portrait of Shreya Sebastian" width="240" height="240">
   </div>
 </header>
 
-<main>
-  <section class="block" id="projects">
-    <div class="container">
-      <div class="head">
-        <h2>Featured projects</h2>
-        <p>Research and engineering, each built and evaluated end to end.</p>
-      </div>
-
-      <div class="featured">
-        <article class="card">
-          <div class="thumb"><img src="img/techjobsradar.png" alt="Tech Jobs Radar overview page with skill demand charts" loading="lazy"></div>
-          <div class="card-body">
-            <span class="kicker">Live since September 2026</span>
-            <h3>Tech Jobs Radar</h3>
-            <p>A public job board that reads postings from Dutch employer career sites, classifies tech roles and extracts structured fields such as skills, seniority and visa sponsorship. Extraction changes are gated in CI by a golden evaluation set.</p>
-            <ul class="tags"><li>FastAPI</li><li>Postgres</li><li>Kubernetes</li><li>AWS</li><li>Terraform</li></ul>
-            <div class="links"><a href="https://techjobsradar.nl">Visit site</a><a href="https://github.com/Shreya-Sebastian/JobRadarNL">Code</a></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="thumb light"><img src="img/retrostc.png" alt="Plot of consolidation against the timing of a salient event" loading="lazy"></div>
-          <div class="card-body">
-            <span class="kicker">Research · open source</span>
-            <h3>RetroSTC-Net</h3>
-            <p>Event-gated, retroactive consolidation of weights in neural networks, inspired by synaptic tagging and capture. Its consolidation log is checked for faithfulness with a deletion test and compared with EWC and Synaptic Intelligence.</p>
-            <ul class="tags"><li>PyTorch</li><li>Continual learning</li><li>Explainability</li></ul>
-            <div class="links"><a href="https://github.com/Shreya-Sebastian/RetroSTC-Net">Code</a></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="thumb"><canvas id="clusters" aria-label="Illustration of clustered data points" role="img"></canvas></div>
-          <div class="card-body">
-            <span class="kicker">MSc thesis · TU Delft</span>
-            <h3>Social inclusion from sensor data</h3>
-            <p>Fused indoor positioning and audio recordings from an inclusive preschool. A Gaussian Mixture Model recovered activity contexts, and per-context mixed models showed inclusion effects hidden in the pooled analysis.</p>
-            <ul class="tags"><li>Unsupervised learning</li><li>Mixed models</li><li>Multimodal data</li></ul>
-            <div class="links"><a href="https://github.com/Shreya-Sebastian/Activity_Contexts_Clustering">Code</a></div>
-          </div>
-        </article>
-      </div>
-
-      <h3 class="more-title">More projects</h3>
-      <div class="more">
-        <article class="card"><div class="card-body">
-          <span class="kicker">Group research · TU Delft</span>
-          <h3>LLM annotation panel</h3>
-          <p>Four LLMs label meeting transcripts against a codebook of creative-thinking types, with agreement measured by pairwise F1 and conditions compared with paired t-tests.</p>
-          <div class="links"><a href="https://github.com/maros02/SSP_Creativity">Code</a></div>
-        </div></article>
-        <article class="card"><div class="card-body">
-          <span class="kicker">Software Architecture · TU Delft</span>
-          <h3>Fault-tolerant sensor ingestion</h3>
-          <p>RabbitMQ pipeline with Pydantic validation and store-and-forward resynchronisation, tested under simulated network failures, with GitLab CI.</p>
-          <div class="links"><a href="https://github.com/Shreya-Sebastian/Software_Architecture_PoC">Code</a></div>
-        </div></article>
-        <article class="card"><div class="card-body">
-          <span class="kicker">BSc thesis · Leiden University</span>
-          <h3>3D CNNs for pollen classification</h3>
-          <p>Compared 3D CNNs on raw pollen Z-stacks with 2D projections, using a custom ConvNet3D and a ResNet3D in PyTorch.</p>
-          <div class="links"><a href="https://github.com/Shreya-Sebastian/3D_ConvNN_Pollen_Classification">Code</a></div>
-        </div></article>
-        <article class="card"><div class="card-body">
-          <span class="kicker">Deep Learning · TU Delft</span>
-          <h3>Paper reproduction</h3>
-          <p>Reproduced a multi-view underwater image enhancement paper and wrote up what did and did not replicate.</p>
-          <div class="links"><a href="https://github.com/Shreya-Sebastian/Deep_Learning_Reproduction_Project">Code</a></div>
-        </div></article>
-        <article class="card"><div class="card-body">
-          <span class="kicker">Personal project</span>
-          <h3>Moneytrail</h3>
-          <p>Local-first Python tool that reads bank CSV exports, matches statement text to merchants and detects recurring payments.</p>
-          <div class="links"><a href="https://github.com/Shreya-Sebastian/Moneytrail">Code</a></div>
-        </div></article>
-        <article class="card"><div class="card-body">
-          <span class="kicker">Personal project</span>
-          <h3>AR gestures</h3>
-          <p>Browser demo that recognises hand gestures from MediaPipe landmarks in real time and anchors particle effects to the palm.</p>
-          <div class="links"><a href="https://github.com/Shreya-Sebastian/AR-Gestures">Code</a></div>
-        </div></article>
-        <article class="card"><div class="card-body">
-          <span class="kicker">Group project</span>
-          <h3>Global earthquake map</h3>
-          <p>Interactive web map of earthquake records, with a Python pipeline that converts tabular data to GeoJSON.</p>
-          <div class="links"><a href="https://github.com/WouterButhker/Earthquakes">Code</a></div>
-        </div></article>
-      </div>
+<section class="block" id="about">
+  <div class="container about">
+    <div>
+      <h2>About</h2>
+      <p style="margin-top:20px">I completed my MSc in Computer Science at TU Delft on the Artificial Intelligence Technology track. My thesis, supervised in the Socially Perceptive Computing Lab, applied unsupervised learning and mixed-effects modelling to multimodal sensor data from an inclusive preschool.</p>
+      <p>Alongside that I build systems end to end. Tech Jobs Radar is a job board I designed, deployed and run, with crawling, classification, a CI evaluation gate and a Kubernetes deployment on AWS. RetroSTC-Net is a research project in PyTorch on retroactive consolidation in neural networks, inspired by synaptic tagging and capture.</p>
+      <p>Before TU Delft I took a BSc in Computer Science at Leiden University on the bioinformatics track. I am a native English speaker with conversational Dutch, based in the Netherlands and available immediately. Outside work I play basketball.</p>
     </div>
-  </section>
-
-  <section class="block" id="about">
-    <div class="container about">
+    <div class="facts">
       <div>
-        <h2>About</h2>
-        <p style="margin-top:20px">I recently completed an MSc in Computer Science at TU Delft on the Artificial Intelligence Technology track. My thesis applied unsupervised learning and mixed-effects modelling to multimodal sensor data, supervised in the Socially Perceptive Computing lab.</p>
-        <p>Alongside that I build systems end to end, from research code in PyTorch to a deployed web service with monitoring, backups and an evaluation set in CI.</p>
-        <p>Native English speaker with conversational Dutch, based in the Netherlands and available immediately.</p>
+        <h3 class="label">Education</h3>
+        <ul class="edu">
+          <li><span class="yr">2023 to 2026</span><div><b>MSc Computer Science</b>, TU Delft<small>Artificial Intelligence Technology track</small></div></li>
+          <li><span class="yr">2020 to 2023</span><div><b>BSc Computer Science</b>, Leiden University<small>Bioinformatics track</small></div></li>
+        </ul>
       </div>
-      <div class="facts">
-        <div>
-          <h3>Education</h3>
-          <ul class="edu">
-            <li><span class="yr">2023 to 2026</span><div><b>MSc Computer Science</b>, TU Delft<small>Artificial Intelligence Technology track</small></div></li>
-            <li><span class="yr">2020 to 2023</span><div><b>BSc Computer Science</b>, Leiden University<small>Bioinformatics track</small></div></li>
-          </ul>
-        </div>
-        <div>
-          <h3>Tools</h3>
-          <ul class="skills">
-            <li>Python</li><li>SQL</li><li>Java</li><li>C++</li><li>PyTorch</li><li>TensorFlow</li><li>scikit-learn</li><li>OpenCV</li><li>pandas</li><li>FastAPI</li><li>Postgres</li><li>Docker</li><li>Kubernetes</li><li>Terraform</li><li>Git</li>
-          </ul>
-        </div>
+      <div>
+        <h3 class="label">Tools</h3>
+        <ul class="chips">
+          <li>Python</li><li>SQL</li><li>Java</li><li>C++</li><li>PyTorch</li><li>TensorFlow</li><li>scikit-learn</li><li>OpenCV</li><li>pandas</li><li>NumPy</li><li>FastAPI</li><li>Postgres</li><li>Docker</li><li>Kubernetes</li><li>Terraform</li><li>Git</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="label">Languages</h3>
+        <ul class="chips"><li>English, native</li><li>Dutch, conversational</li></ul>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="block" id="contact">
-    <div class="container">
-      <div class="contact-box">
-        <div>
-          <h2>Get in touch</h2>
-          <p>Open to roles in machine learning, data science and software engineering in the Netherlands.</p>
-        </div>
-        <div class="contact-links">
-          <div class="mail"><span><span class="k">Email</span><br><span id="email">shreyaseb@gmail.com</span></span><button class="copy" type="button" id="copy-email">Copy</button></div>
-          <a href="https://www.linkedin.com/in/shreya-sebastian"><span><span class="k">LinkedIn</span><br>shreya-sebastian</span><span aria-hidden="true">↗</span></a>
-          <a href="https://github.com/Shreya-Sebastian"><span><span class="k">GitHub</span><br>Shreya-Sebastian</span><span aria-hidden="true">↗</span></a>
-          <a href="Shreya_Sebastian_CV.pdf"><span><span class="k">CV</span><br>Download PDF</span><span aria-hidden="true">↓</span></a>
-        </div>
-      </div>
+<section class="block">
+  <div class="container">
+    <div class="head">
+      <h2>Highlighted projects</h2>
+      <a href="/projects/">All projects →</a>
     </div>
-  </section>
+    <div class="grid3">
+<article class="card" data-kind="engineering data">
+  <div class="thumb"><img src="/img/techjobsradar.png" alt="Tech Jobs Radar overview page with skill demand charts" loading="lazy"></div>
+  <div class="card-body">
+    <span class="kicker">Live since September 2026</span>
+    <h3><a href="/projects/tech-jobs-radar/">Tech Jobs Radar</a></h3>
+    <p>A public job board that reads postings from Dutch employer career sites, classifies tech roles and extracts structured fields such as skills, seniority and visa sponsorship.</p>
+    <ul class="tags"><li>FastAPI</li><li>Postgres</li><li>Kubernetes</li><li>AWS</li><li>Terraform</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="research ml">
+  <div class="thumb fig"><img src="/img/retrostc.png" alt="Plot of consolidation against the timing of a salient event" loading="lazy"></div>
+  <div class="card-body">
+    <span class="kicker">Research · open source</span>
+    <h3><a href="/projects/retrostc-net/">RetroSTC-Net</a></h3>
+    <p>Event-gated, retroactive consolidation of weights in neural networks, inspired by synaptic tagging and capture, with a consolidation log tested for faithfulness.</p>
+    <ul class="tags"><li>PyTorch</li><li>Continual learning</li><li>Explainability</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="research ml data">
+  <div class="thumb"><canvas class="clusters" role="img" aria-label="Illustration of seven clusters of data points"></canvas></div>
+  <div class="card-body">
+    <span class="kicker">MSc thesis · TU Delft</span>
+    <h3><a href="/projects/msc-thesis/">Social inclusion from sensor data</a></h3>
+    <p>Fused indoor positioning and audio from an inclusive preschool, recovered activity contexts with a Gaussian Mixture Model and compared children with and without hearing loss within each context.</p>
+    <ul class="tags"><li>Unsupervised learning</li><li>Mixed models</li><li>Multimodal data</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="container">
+    <div class="band">
+      <div><h2>Get in touch</h2><p>Open to roles in machine learning, data science and software engineering.</p></div>
+      <div class="actions"><a class="btn primary" href="/contact/">Contact</a><a class="btn" href="/Shreya_Sebastian_CV.pdf">Download CV</a></div>
+    </div>
+  </div>
+</section>
+
 </main>
-
-<footer><div class="container">© 2026 Shreya Sebastian</div></footer>
-
-<script>
-document.getElementById('copy-email').addEventListener('click', function () {
-  var btn = this, el = document.getElementById('email');
-  function done(m) { btn.textContent = m; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); }
-  function select() { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
-  try { navigator.clipboard.writeText(el.textContent).then(function () { done('Copied'); }, function () { select(); done('Selected'); }); }
-  catch (e) { select(); done('Selected'); }
-});
-
-// Thesis card illustration: a few Gaussian clusters of points, drawn in the theme's colours
-(function () {
-  var c = document.getElementById('clusters'); if (!c) return;
-  function draw() {
-    var r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-    c.width = r.width * dpr; c.height = r.height * dpr;
-    var x = c.getContext('2d'); x.scale(dpr, dpr);
-    var cs = getComputedStyle(document.documentElement);
-    var cols = [cs.getPropertyValue('--accent').trim(), '#e0894f', '#3f9c7a', '#b05cc4', '#d4b23c', '#5d6270'];
-    var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-    function g() { return Math.sqrt(-2 * Math.log(rnd() + 1e-9)) * Math.cos(2 * Math.PI * rnd()); }
-    var centres = [[.2,.3],[.45,.68],[.72,.3],[.82,.72],[.33,.85],[.58,.42]];
-    centres.forEach(function (p, i) {
-      x.fillStyle = cols[i]; x.globalAlpha = .75;
-      for (var k = 0; k < 46; k++) {
-        x.beginPath();
-        x.arc((p[0] + g() * .06) * r.width, (p[1] + g() * .07) * r.height, 2.6, 0, Math.PI * 2);
-        x.fill();
-      }
-    });
-  }
-  draw();
-  addEventListener('resize', draw);
-  if (matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
-})();
-</script>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
 </body>
 </html>

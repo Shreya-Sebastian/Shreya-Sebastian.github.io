@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Does classifying pollen from full 3D microscope stacks beat working from 2D projections of the same images?">
+<title>3D CNNs for pollen classification | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">BSc thesis · Leiden University</p>
+    <h1>3D CNNs for pollen classification</h1>
+    <p class="summary">Does classifying pollen from full 3D microscope stacks beat working from 2D projections of the same images?</p>
+    
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<h2>Overview</h2>
+<p>Pollen grains are imaged under the microscope as Z-stacks, series of images at different focal depths. Earlier work on automatic classification of Urticaceae pollen used 2D projections of these stacks. This thesis builds on that work and asks whether models that see the full 3D stack do better.</p>
+<h2>Approach</h2>
+<ul>
+<li>Implemented a custom ConvNet3D and a torchvision ResNet3D in PyTorch.</li>
+<li>Trained them on about 600 raw Z-stacks of variable size, and compared them with models trained on 2D projections of the same data.</li>
+</ul>
+<h2>Result</h2>
+<p>The best model reached 95 percent test accuracy.</p>
+<p>The project builds on <a href="https://www.sciencedirect.com/science/article/pii/S0925231222014308">Analysis of automatic image classification methods for Urticaceae pollen classification</a>.</p>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>BSc thesis, Leiden University, 2023</dd></div><div><dt>Stack</dt><dd>Python, PyTorch, torchvision</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/3D_ConvNN_Pollen_Classification">Code ↗</a></div>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/llm-annotation-panel/"><span>← Previous</span><b>LLM annotation panel</b></a><a class="right" href="/projects/sensor-ingestion/"><span>Next →</span><b>Fault-tolerant sensor ingestion</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>

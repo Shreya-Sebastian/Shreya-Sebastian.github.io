@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How far can you get from bank export files alone? A local tool that resolves merchants and detects recurring payments, without the data leaving your computer.">
+<title>Moneytrail | Shreya Sebastian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
+  </div>
+</nav>
+<main>
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">Personal project</p>
+    <h1>Moneytrail</h1>
+    <p class="summary">How far can you get from bank export files alone? A local tool that resolves merchants and detects recurring payments, without the data leaving your computer.</p>
+    
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<h2>Overview</h2>
+<p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally and stores everything in a DuckDB file. Most of the work turned out to be in the data itself: working out who a payment actually went to, and measuring how often that goes right.</p>
+<h2>Merchant resolution</h2>
+<p>One shop shows up under many names: branch numbers, city suffixes, payment terminal prefixes, provider wrappers and names cut off at 22 characters. Each name is normalised, and names are then merged if they share a counterparty IBAN, have a high fuzzy-match score, are a truncated version of another name or match as an acronym.</p>
+<h2>Recurring payments</h2>
+<p>Payments are grouped by merchant, type and direction, split into amount bands and tested against weekly, four-weekly, monthly, quarterly and yearly schedules. It handles four-weekly billing, small price changes, stopped payments, subscriptions mixed with one-off purchases at one merchant, and two subscriptions under a single name.</p>
+<h2>Evaluation</h2>
+<p>A generator produces 18 months of synthetic transactions with the correct answers stored alongside, in all four banks' formats. There are two sets: a development set written alongside the rules, and a held-out set written separately, without access to the matching code, with extra kinds of messiness. The held-out set is used only for reporting.</p>
+<div class="table-wrap"><table>
+<tr><th></th><th>Development</th><th>Held-out</th></tr>
+<tr><td>Merchant grouping (B-cubed F1)</td><td>1.000</td><td>0.952 to 0.961</td></tr>
+<tr><td>Transactions with the right merchant name</td><td>93.6% to 96.0%</td><td>75.3% to 76.8%</td></tr>
+<tr><td>Recurring series found (precision / recall)</td><td>1.000 / 1.000</td><td>0.944 to 1.000 / 0.944</td></tr>
+<tr><td>Price changes and cancellations detected</td><td>100%</td><td>100%</td></tr>
+</table></div>
+<p>The held-out numbers are the ones to believe. Most of the remaining errors come from payment providers whose shared IBAN joins unrelated shops, and from branch numbers glued to shop names.</p>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>Personal project, 2026</dd></div><div><dt>Stack</dt><dd>Python, DuckDB, RapidFuzz, pytest</dd></div></dl>
+    <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Moneytrail">Code ↗</a></div>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a href="/projects/sensor-ingestion/"><span>← Previous</span><b>Fault-tolerant sensor ingestion</b></a><a class="right" href="/projects/deep-learning-reproduction/"><span>Next →</span><b>Deep learning paper reproduction</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js"></script>
+</body>
+</html>
