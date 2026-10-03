@@ -166,6 +166,11 @@ a.contact-item:hover { border-color: var(--accent); transform: translateY(-2px);
 .contact-item .k { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: block; }
 .contact-item .v { font-weight: 600; font-size: 1.05rem; overflow-wrap: anywhere; }
 .contact-item .arrow { color: var(--accent); font-size: 1.2rem; }
+.email-item { position: relative; transition: border-color .15s ease, transform .15s ease; }
+.email-item a { text-decoration: none; min-width: 0; }
+.email-item a::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+.email-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.email-item .copy { position: relative; z-index: 1; }
 .copy { font: inherit; font-size: 0.85rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
 .copy:hover { border-color: var(--fg); }
 .contact-note { display: grid; gap: 18px; }
@@ -204,6 +209,6 @@ footer a:hover { color: var(--fg); }
 @media (max-width: 400px) { .logo { font-size: 1rem; } .nav ul { gap: 12px; } }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .btn, .card, .contact-item { transition: none; }
-  .btn:hover, .card:hover, a.contact-item:hover { transform: none; }
+  .btn, .card, .contact-item, .email-item { transition: none; }
+  .btn:hover, .card:hover, a.contact-item:hover, .email-item:hover { transform: none; }
 }
