@@ -54,7 +54,7 @@
 </ul>
 <h2>What replicated</h2>
 <figure><img src="/img/dl_repro_output.png" alt="Diver image: raw input, reference and model output" loading="lazy"><figcaption>Raw input, reference and our model's output.</figcaption></figure>
-<p>The enhanced images come out visually close to the references. The quantitative scores did not line up with the paper's: PSNR and SSIM came out lower than reported, while two no-reference metrics came out far higher, which pointed to differences in how the metrics were evaluated rather than to the model alone. The write-up recommends a separate validation set for model selection and testing on a second dataset.</p>
+<p>The enhanced images come out visually close to the references. The quantitative scores did not line up with the paper's: PSNR and SSIM came out lower than reported, while PCQI, UCIQE and UIQM came out far higher. The write-up attributes the gap to possible differences in image size, training procedure or metric implementation. The write-up recommends a separate validation set for model selection and testing on a second dataset.</p>
 
   </article>
   <aside class="p-side">
