@@ -160,6 +160,7 @@ figcaption { font-size: 0.85rem; color: var(--muted); padding: 10px 4px 0; }
 
 /* contact */
 .contact-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; padding-block: 24px 80px; align-items: start; }
+.contact-wrap.single { grid-template-columns: minmax(0, 640px); }
 .contact-list { display: grid; gap: 12px; }
 .contact-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; text-decoration: none; transition: border-color .15s ease, transform .15s ease; }
 a.contact-item:hover { border-color: var(--accent); transform: translateY(-2px); }
