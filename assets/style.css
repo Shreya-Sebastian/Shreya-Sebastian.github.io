@@ -161,6 +161,13 @@ figcaption { font-size: 0.85rem; color: var(--muted); padding: 10px 4px 0; }
 .next a:hover b { color: var(--accent); }
 .next a.right { text-align: right; margin-left: auto; }
 
+/* project page: screenshot beside its description */
+.prose .view { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); gap: 28px; align-items: start; margin: 32px 0; }
+.prose .view figure { margin: 0; }
+.prose .view h3 { margin-top: 4px; }
+.prose .view .eyebrow { margin: 0 0 4px; }
+@media (max-width: 640px) { .prose .view { grid-template-columns: minmax(0, 1fr); } }
+
 /* live demo embed */
 .demo { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #12151c, #1d2333); margin-top: 8px; }
 .demo iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
