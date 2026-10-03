@@ -50,3 +50,16 @@ document.querySelectorAll('[data-copy]').forEach(function (btn) {
   addEventListener('resize', all);
   try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', all); } catch (e) {}
 })();
+
+// Click-to-start live demos: the iframe (and its camera request) is only created after the click
+document.querySelectorAll('.demo').forEach(function (box) {
+  var btn = box.querySelector('.demo-btn'); if (!btn) return;
+  btn.addEventListener('click', function () {
+    var f = document.createElement('iframe');
+    f.src = box.getAttribute('data-src');
+    f.title = 'Live demo';
+    f.allow = 'camera; fullscreen';
+    box.innerHTML = '';
+    box.appendChild(f);
+  });
+});
