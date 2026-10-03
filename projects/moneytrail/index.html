@@ -34,7 +34,7 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally and stores everything in a DuckDB file. Most of the work turned out to be in the data itself: working out who a payment actually went to, and measuring how often that goes right.</p>
+<p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally and stores everything in a DuckDB file. Most of the work turned out to be in the data itself: working out who a payment went to, and measuring how often that goes right.</p>
 <h2>Merchant resolution</h2>
 <p>One shop shows up under many names: branch numbers, city suffixes, payment terminal prefixes, provider wrappers and names cut off at 22 characters. Each name is normalised, and names are then merged if they share a counterparty IBAN, have a high fuzzy-match score, are a truncated version of another name or match as an acronym.</p>
 <h2>Recurring payments</h2>

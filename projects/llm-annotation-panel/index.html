@@ -37,7 +37,7 @@
 <p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before, in the spirit of a panel of experts that calibrates over time.</p>
 <h2>Set-up</h2>
 <ul>
-<li><b>Data.</b> 232 meeting transcripts from the QMSum dataset (academic, committee and product meetings). Speech-recognition markup is cleaned and the first 100 speaker turns of each meeting are kept.</li>
+<li><b>Data.</b> A pool of 232 meeting transcripts from the QMSum dataset (academic, committee and product meetings), from which each iteration draws one at random without repetition. Speech-recognition markup is cleaned and the first 100 speaker turns of each meeting are kept.</li>
 <li><b>Codebook.</b> Eight types of creative thinking, each with a definition and an example: divergent thinking, convergent thinking, fluency, flexibility, elaboration, associative leap, contextual sensitivity and problem recognition.</li>
 <li><b>Prompt.</b> Each model gets an expert-annotator instruction, the codebook and the transcript, and must return pure JSON: a list of exact transcript passages, each with a creative type.</li>
 <li><b>Two conditions.</b> In each iteration a new transcript is drawn and every model annotates it twice. In the baseline condition it works alone. In the feedback condition its prompt also contains the other two models' annotations of the previous transcript, as few-shot examples.</li>

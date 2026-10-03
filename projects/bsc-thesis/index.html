@@ -38,8 +38,8 @@
 <p>This thesis asks whether a network that sees the whole stack in 3D does better.</p>
 <h2>Data and preprocessing</h2>
 <ul>
-<li>Three classes: Parietaria, Urtica dioica/urens and Urtica membranacea.</li>
-<li>Each stack is zero-padded or cropped to 224 × 224 pixels, the middle frames are kept, and values are rescaled to [−1, 1].</li>
+<li>About 600 Z-stacks of variable size, in three classes: Parietaria, Urtica dioica/urens and Urtica membranacea.</li>
+<li>Each stack is zero-padded or cropped to 224 × 224 pixels and trimmed to its middle 20 frames, and values are rescaled to [−1, 1].</li>
 <li>A held-out test set and a validation set are split off. Training stacks are augmented with flips and rotations; an augmentation threshold controls how many extra samples are generated.</li>
 </ul>
 <h2>Models</h2>

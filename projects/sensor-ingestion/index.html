@@ -34,7 +34,7 @@
   <article class="prose">
 
 <h2>Context</h2>
-<p>For the Software Architecture course our team designed a smart home system that learns household routines from sensor data. One of its key quality requirements is that no sensor data is lost when the home's network connection drops. I built the proof of concept that tests this part of the architecture, and wrote the report sections on it.</p>
+<p>For the Software Architecture course our team designed a smart home system that learns household routines from sensor data. The proof of concept tests one part of that architecture: getting sensor readings to the backend without losing them when the home's network connection drops. I built most of the proof of concept and wrote the report sections on it.</p>
 <h2>Architecture</h2>
 <figure><img src="/img/sensor_poc_architecture.png" alt="Sensors with local buffers send HTTP requests to an ingestion server, which publishes to a message queue read by a consumer" loading="lazy"><figcaption>Sensors send readings over HTTP to the ingestion server, which publishes them to a queue; each sensor keeps a local buffer for when the connection is down.</figcaption></figure>
 <ul>
