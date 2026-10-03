@@ -170,6 +170,7 @@ figcaption { font-size: 0.85rem; color: var(--muted); padding: 10px 4px 0; }
 .demo-start .btn.ghost { border-color: #e8e9ee; color: #e8e9ee; }
 .demo-start .btn.primary { background: #e8e9ee; color: #12151c; border-color: #e8e9ee; }
 @media (max-width: 560px) { .demo { aspect-ratio: 3 / 4; } }
+.demo.tall { aspect-ratio: auto; height: min(860px, 85vh); }
 
 /* contact */
 .contact-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; padding-block: 24px 80px; align-items: start; }
