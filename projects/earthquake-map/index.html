@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=1c58edbb">
+<link rel="stylesheet" href="/assets/style.css?v=a9d416f8">
 </head>
 <body>
 <nav class="nav" aria-label="Main">
@@ -33,11 +33,16 @@
 <div class="container p-layout">
   <article class="prose">
 
-<h2>Overview</h2>
-<p>An interactive visualisation of 6,393 significant earthquakes and 2,512 tsunamis, from ancient records to 2025, built with D3 for the timeline, scatterplot and detail view, OpenLayers for the map and heatmap, and Vite for builds. Four coordinated views use linked brushing: a selection in any view filters the other three.</p>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>An interactive web visualisation of 6,393 significant earthquakes and 2,512 tsunamis, from ancient records to 2025, built as a group project with D3, OpenLayers and Vite.</li><li>A world map, a timeline, a scatterplot and a detail view are coordinated through linked brushing, so a selection in any view filters the other three.</li><li>My part was the timeline: a brushable heatmap grid of year ranges against months with adaptive binning, drill-down navigation and a log-scaled sequential colour encoding.</li><li>The records were converted from tab-separated exports to GeoJSON in Python, and the site is deployed to GitHub Pages through continuous deployment.</li></ul></div>
 
-<h2>Coordinated views</h2>
-<p>Each view exposes a draw and an update operation; a selection in one view passes the selected records to the update of the others, and each applies them in its own way:</p>
+<h2>Overview</h2>
+<p>An interactive visualisation of 6,393 significant earthquakes and 2,512 tsunamis, from ancient records to 2025, built with D3 for the timeline, scatterplot and detail view, OpenLayers for the map and heatmap, and Vite for builds. Four coordinated views use linked brushing: a selection in any view filters the other three. The design goal is to let a user move between where, when and how severe: find a cluster on the map, see when it happened, compare its magnitude and impact with the rest of the record, and read the full entry for a single event.</p>
+
+<h2>Data</h2>
+<p>The earthquake and tsunami records were exported as tab-separated files and converted to GeoJSON in Python. Every row with valid coordinates becomes a point feature, and all non-empty fields are kept as properties, so missing values are absent rather than encoded as zeros. Tectonic plate boundaries are loaded as a third GeoJSON layer. The attributes cover location, date and time, magnitude, focal depth, Modified Mercalli Intensity, and impact measures such as deaths, injuries, damage and houses destroyed or damaged, many with a recorded category that stands in where the exact figure is missing. Earthquakes and tsunamis are linked through a tsunami identifier on the earthquake record.</p>
+
+<h2>Linked views architecture</h2>
+<p>All three datasets are loaded once at start-up and held in memory, and every view works on GeoJSON features directly, so a selection is simply a subset of the same feature objects and needs no conversion between views. Each view exposes a draw and an update operation; a selection in one view passes the selected records to the update of the others, and each applies them in its own way:</p>
 <div class="table-wrap"><table>
 <tr><th>Receiving view</th><th>What it does with a selection</th></tr>
 <tr><td>World map</td><td>Shows only the selected earthquakes, in both the point and the heatmap layer.</td></tr>
@@ -45,20 +50,20 @@
 <tr><td>Timeline</td><td>Rebuilds its grid from the selection, adapting its year ranges to the selection's span.</td></tr>
 <tr><td>Detail view</td><td>Shows the full record of the first selected earthquake.</td></tr>
 </table></div>
+<p>The receiving behaviours differ by view. The map filters to the selection. The scatterplot keeps the full distribution in the background, since a selected point is read relative to all others. The timeline re-bins, since a selection often covers a much shorter span than the full record. Two global controls act on all four views at once: a reset, and a tsunami-only filter that restricts every view to earthquakes that caused a tsunami.</p>
 
 <div class="view">
 <figure><img src="/img/eq_timeline.jpg" alt="Timeline grid of year ranges against months, with a selected block of cells highlighted in orange" loading="lazy"></figure>
 <div>
 <p class="eyebrow">View 1 · my part</p>
 <h3>Timeline</h3>
-<p>The records span several thousand years and are very unevenly distributed, so a histogram over time does not work. I built the timeline as a heatmap grid of year ranges against months, with adaptive binning: range width follows the span of the data shown, from 500 years down to centuries, decades and single years.</p>
+<p>The records span several thousand years and are very unevenly distributed, so a histogram over time does not work. I built the timeline as a heatmap grid of year ranges against months, with adaptive binning: range width follows the span of the data shown, 500 years for spans over 500 years, then centuries, decades and single years once the span is ten years or less. Counts are aggregated per year and month and then summed per range, so each cell holds the number of events in one month column of one year range.</p>
 <ul>
-<li>Brushing a block of cells selects a timeframe and filters the other views, with a status line reporting the selection size.</li>
-<li>Clicking a year range drills down into finer ranges, with history-based back navigation.</li>
-<li>Records without a month (402, mostly historical) get their own selectable Unknown column.</li>
-<li>Cell colour uses a log-scaled sequential encoding, so sparse ranges stay visible next to dense ones, with a contrasting palette for selections.</li>
+<li>Brushing a block of cells selects a timeframe and filters the other views; the brush is resolved into the year ranges and months it overlaps, so a selection always follows the grid. Selected cells are outlined, which keeps a selection visible over empty cells, and a status line reports the selection size. An empty selection says so and resets the other views.</li>
+<li>Clicking a year range drills down into finer ranges. Navigation keeps a stack of zoom levels: only drilling down adds a level and only the back button removes one, while a selection from another view starts a new stack.</li>
+<li>Records without a month (402, mostly historical) get their own selectable Unknown column, set slightly apart from the months.</li>
+<li>Cell colour uses a log-scaled sequential encoding on a multi-hue palette, so sparse ranges stay visible next to dense ones; empty cells stay neutral grey, and selections switch to a contrasting palette. A legend with ticks at powers of ten shows the scale.</li>
 </ul>
-<p>After the course I extended the timeline in my own fork, adding the log-scaled colours, selection feedback and the Unknown column.</p>
 </div>
 </div>
 
@@ -67,9 +72,9 @@
 <div>
 <p class="eyebrow">View 2</p>
 <h3>World map</h3>
-<p>An OpenLayers map stacks an OpenStreetMap base layer, tectonic plate boundaries, a heatmap layer and the earthquake points. Dot size and colour can encode magnitude, focal depth, intensity or impact measures, with linear scales for magnitude and intensity and logarithmic scales for depth and impact.</p>
+<p>An OpenLayers map stacks an OpenStreetMap base layer, tectonic plate boundaries, a heatmap layer and the earthquake points. Dot size and colour can encode magnitude, focal depth, intensity or impact measures, with linear scales for magnitude and intensity and logarithmic scales for depth and impact; colour can also show the country or whether an earthquake caused a tsunami.</p>
 <ul>
-<li>A switch replaces the points with a magnitude-weighted heatmap; another filters to tsunami-causing earthquakes.</li>
+<li>A switch replaces the points with a magnitude-weighted heatmap; another filters to tsunami-causing earthquakes. Weights are scaled down so that dense regions do not saturate.</li>
 <li>Click and box selection, including boxes across the 180th meridian, feed the linked views.</li>
 <li>Here the map shows only the earthquakes from the timeline selection above.</li>
 </ul>
@@ -83,18 +88,25 @@
 <h3>Scatterplot</h3>
 <p>Any two attributes can be plotted against each other. The default, magnitude against focal depth, shows a dense cluster at shallow depths and a separate group of deep-focus earthquakes.</p>
 <ul>
-<li>Axes for skewed impact measures such as deaths or damage switch to a D3 symmetric log scale with ticks at powers of ten.</li>
-<li>Click and box selection highlight earthquakes on the map and timeline, and the selection persists across axis changes.</li>
+<li>Axes for skewed impact measures such as deaths or damage switch to a D3 symmetric log scale with ticks at powers of ten once their largest value exceeds 1,000. The symmetric log scale, unlike a plain log scale, is defined at zero, which many impact values are.</li>
+<li>Earthquakes missing either attribute are left out of the plot rather than placed at zero.</li>
+<li>Click and box selection highlight earthquakes on the map and timeline, and the selection persists across axis changes, with a message when the selected earthquakes have no value for the new axes.</li>
 </ul>
 </div>
 </div>
 
+<h2>Encodings</h2>
+<p>The encodings follow the distribution of each attribute. Magnitude and intensity map linearly to dot size. Focal depth and impact measures are heavily right-skewed, with a few events orders of magnitude above the rest, so they map logarithmically, both as dot size on the map and as symmetric log axes in the scatterplot. The timeline count follows the same reasoning: with a linear colour scale the sparse historical ranges would be indistinguishable from empty cells next to the dense recent ones. Missing values are treated as missing throughout, by a neutral colour, a default dot size or exclusion from the scatterplot, rather than as zeros that would distort the scales.</p>
+
+<h2>Interaction design</h2>
+<p>Selections use direct manipulation in every view: click for a single event and drag a box for a set, with box selection on Ctrl-drag in the map and scatterplot, so that a plain drag still pans the map. Each selection is applied immediately to the other views, without a separate apply step, so cause and effect stay visible. Feedback is explicit where a selection could otherwise look like a failure, such as an empty timeframe or a selection without values on the current scatterplot axes.</p>
+
 <h3>Points of interest and details</h3>
 <figure><img src="/img/eq_details.jpg" alt="Points of interest buttons, the colour and size legend, and the detail panel for a selected earthquake" loading="lazy"><figcaption>Preset points of interest, the legend, and the full record of a selected earthquake.</figcaption></figure>
-<p>Three preset points of interest guide the user to notable patterns: earthquakes with many people missing, with many houses destroyed, and low-magnitude earthquakes with high damage. Each selects one event across all four views, sets matching scatterplot axes and links to official information. The detail panel shows the full record of a selected earthquake and joins it to its related tsunami records.</p>
+<p>Three preset points of interest guide the user to notable patterns: earthquakes with many people missing, with many houses destroyed, and low-magnitude earthquakes with high damage. Each selects one event across all four views, sets matching scatterplot axes, for example magnitude against damage for the low-magnitude case, and links to official information. The detail panel shows the full record of a selected earthquake: date and time fields are combined into one timestamp, a missing impact figure is replaced by its recorded category where there is one, and the tsunami identifier is used to join the related tsunami records into a second section.</p>
 
-<h2>Data and deployment</h2>
-<p>The earthquake and tsunami records were exported as tab-separated files and converted to GeoJSON point features in Python. The site is built with Vite and deployed to GitHub Pages through continuous deployment.</p>
+<h2>Deployment</h2>
+<p>The site is built with Vite into a static bundle and deployed to GitHub Pages through continuous deployment, so each update is built and published automatically as a static site, without a server.</p>
 
   </article>
   <aside class="p-side">
