@@ -34,11 +34,13 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>Underwater photos lose colour and contrast because water absorbs and scatters light. The paper we reproduced (Zhou et al., 2023) enhances them with a network called MFEF that fuses several versions of the same image. There was no public code, so we rebuilt the method from the paper's description and trained it on the UIEB benchmark. This was a team of four for the TU Delft Deep Learning course; I built the model architecture, contributed to preprocessing and wrote the blog post.</p>
+<p>Underwater photos lose colour and contrast because water absorbs and scatters light. The paper we reproduced (Zhou et al., 2023) enhances them with MFEF, a multi-view fusion network. With no public code available, we reimplemented the method in PyTorch from the paper's description and trained it on the UIEB benchmark. This was a team of four for the TU Delft Deep Learning course; I built the model architecture, contributed to preprocessing and wrote the blog post.</p>
+
 <h2>Inputs</h2>
 <figure><img src="/img/dl_repro_views.jpg" alt="Grid of underwater images: raw, white-balanced, contrast-enhanced and reference versions" loading="lazy"><figcaption>From top to bottom: raw images, the white-balanced view, the contrast-enhanced (CLAHE) view and the reference images.</figcaption></figure>
-<p>Each raw image is turned into three views: the original, a white-balanced version and a contrast-enhanced version (CLAHE on the lightness channel). Images are resized to 256 × 256, and the 890 image pairs are split 85/15 into training and test sets. White balance corrects the colour shift caused by water, which often suppresses the red channel; CLAHE equalises contrast tile by tile, which brings out detail when visibility is low.</p>
-<h2>The model I built</h2>
+<p>Each raw image is turned into three views: the original, a white-balanced version that corrects the colour shift caused by water, and a CLAHE version that equalises contrast on the lightness channel. Images are resized to 256 × 256, and the 890 image pairs are split 85/15 into training and test sets.</p>
+
+<h2>Architecture</h2>
 <pre>original, white-balanced, CLAHE views
   → residual enhancement module per view
   → multi-feature fusion
@@ -47,23 +49,19 @@
   → pixel-weighted channel attention per scale
   → coarse-to-fine reconstruction → enhanced image</pre>
 <ul>
-<li><b>Residual enhancement modules.</b> Each view first passes through its own stack of residual blocks: short sequences of 3 × 3 convolutions with a skip connection that adds the input back to the output. The same block is reused in the later stages.</li>
-<li><b>Multi-feature fusion.</b> Fusion modules combine the views with 1 × 1, 3 × 3 and 5 × 5 convolutions and residual connections, then concatenate the branches and merge them with a final convolution. Three fusion modules feed a second set of residual modules connected in a chain, and each result is added pixel-wise to one of the input views.</li>
-<li><b>Multi-scale attention.</b> Features are produced at three scales, and same-scale features are combined with a channel attention module that learns how much to weight each view. Each branch goes through the same convolution three times with downsampling in between; same-scale maps from the three branches are concatenated and passed to a pixel-weighted channel attention module (PCAM), which combines a per-pixel weighting with a per-channel weighting from globally pooled features.</li>
-<li><b>Reconstruction.</b> Further residual stages and upsampling produce the enhanced image, working from the coarsest scale up to full resolution, with a last convolution that aggregates the features into a three-channel image.</li>
+<li><b>Residual enhancement.</b> Each view passes through its own stack of residual blocks of 3 × 3 convolutions with skip connections.</li>
+<li><b>Multi-feature fusion.</b> Fusion modules combine the views with parallel 1 × 1, 3 × 3 and 5 × 5 convolution branches and residual connections. A second chain of residual modules follows, and each result is added pixel-wise to one of the input views.</li>
+<li><b>Multi-scale channel attention.</b> Shared-kernel convolutions with downsampling produce features at three scales. Same-scale maps from the three branches are concatenated and passed to a pixel-weighted channel attention module (PCAM), which combines per-pixel weighting with per-channel weighting from globally pooled features.</li>
+<li><b>Reconstruction.</b> Residual stages and upsampling rebuild the image from the coarsest scale up to full resolution.</li>
 </ul>
+<p>Where the paper left details open, we made explicit design choices: 1 × 1 convolutions to match channel counts between modules, and concatenation of same-size outputs across branches for the unspecified dense connections.</p>
+
 <h2>Loss and training</h2>
-<p>Training used an L1 loss plus a perceptual loss on VGG-16 features, with Adam, for about 12 hours on a single GPU. For the perceptual term, the output and the reference both pass through a VGG-16 network pretrained on ImageNet, and the differences between their activations are summed over its layers; this captures texture, colour and structure that a pixel loss misses. We trained for 200 epochs, as the paper proposes, evaluating on the test set every 150 training images and keeping the weights with the lowest test loss. The model converged at epoch 89.</p>
-<h2>Where the paper was ambiguous</h2>
-<ul>
-<li>Channel counts between modules were not specified, so we added 1 × 1 convolutions to match them. After the second residual stage, concatenation raises the channel count, but each branch must have three channels to be added to its input view.</li>
-<li>Parts of the architecture figure were open to interpretation; we implemented them as shared-kernel convolutions with downsampling. The figure shows three coloured convolution sections joined by undefined "dense connections"; we concatenated the same-size outputs across branches before attention.</li>
-<li>The channel shuffle step was left out, as its backward pass was not available in PyTorch. In the paper it links the feature encodings of the different views inside the fusion module.</li>
-</ul>
-<h2>What replicated</h2>
+<p>Training used an L1 loss combined with a perceptual loss on the activations of an ImageNet-pretrained VGG-16, which captures texture, colour and structure that a pixel loss misses. The model was optimised with Adam for 200 epochs on a single GPU, and converged at epoch 89.</p>
+
+<h2>Results</h2>
 <figure><img src="/img/dl_repro_output.png" alt="Diver image: raw input, reference and model output" loading="lazy"><figcaption>Raw input, reference and our model's output.</figcaption></figure>
-<p>The enhanced images come out visually close to the references. We evaluated with the paper's five metrics: PSNR and SSIM against the reference, PCQI for contrast, and the underwater-specific UCIQE and UIQM. SSIM scores were concentrated in a narrow range, suggesting structure is preserved consistently, while PSNR varied more between images.</p>
-<p>The quantitative scores did not line up with the paper's: PSNR and SSIM came out lower than reported, while PCQI, UCIQE and UIQM came out far higher. The write-up attributes the gap to possible differences in image size, training procedure or metric implementation. The write-up recommends a separate validation set for model selection, since choosing the checkpoint on test loss may favour the test data, and testing on a second dataset.</p>
+<p>The enhanced images come out visually close to the references. We evaluated with the paper's five metrics: PSNR and SSIM against the reference, PCQI for contrast, and the underwater-specific UCIQE and UIQM. SSIM was concentrated in a narrow range, indicating that structure is preserved consistently, while PSNR varied more between images. PSNR and SSIM were lower than reported in the paper, and the other three metrics did not line up with the paper's values.</p>
 
   </article>
   <aside class="p-side">

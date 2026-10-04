@@ -35,38 +35,23 @@
 
 <h2>Overview</h2>
 <p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before, in the spirit of a panel of experts that calibrates over time.</p>
-<p>The panel has three members: Llama 3.3 70B (served through Groq), GPT-4.1 and Gemini 2.5 Pro. Each model is reached through a small wrapper class for its provider, and the panel itself is a short list of members in the experiment script, so adding or replacing a model means editing that list.</p>
-
-<h2>Pipeline</h2>
-<p>The project is a chain of five scripts, each reading the output of the one before it from disk, so the analysis can be rerun on the stored annotations without calling the models again.</p>
-<pre>preprocess.py      raw QMSum meetings  -&gt;  cleaned transcripts
-iterative.py       transcripts         -&gt;  one JSON file per model, iteration and condition
-analyze-results.py annotations         -&gt;  pairwise F1 per iteration and condition
-visualize.py       five runs           -&gt;  averaged scores and plots
-data-analysis.py   averaged scores     -&gt;  normality checks, paired t-test, Kendall's tau</pre>
+<p>The panel has three members: Llama 3.3 70B (served through Groq), GPT-4.1 and Gemini 2.5 Pro, each accessed through its provider's API.</p>
 
 <h2>Set-up</h2>
 <ul>
-<li><b>Data.</b> A pool of 232 meeting transcripts from the QMSum dataset (academic, committee and product meetings), from which each iteration draws one at random without repetition. Speech-recognition markup such as vocal-sound and disfluency tags is cleaned, spelled-out acronyms are joined back together, and the first 100 speaker turns of each meeting are kept, each as a <code>speaker: text</code> line.</li>
+<li><b>Data.</b> 232 meeting transcripts from the QMSum dataset (academic, committee and product meetings), cleaned of speech-recognition markup and truncated to the first 100 speaker turns.</li>
 <li><b>Codebook.</b> Eight types of creative thinking, each with a definition and an example: divergent thinking, convergent thinking, fluency, flexibility, elaboration, associative leap, contextual sensitivity and problem recognition.</li>
-<li><b>Prompt.</b> Each model gets an expert-annotator instruction, the codebook and the transcript, and must return pure JSON with no prose or markdown: a list of exact transcript passages, each with a creative type. The prompt includes one example object and asks for passages that are one-to-one with the transcript.</li>
-<li><b>Two conditions.</b> In each iteration a new transcript is drawn and every model annotates it twice. In the baseline condition it works alone. In the feedback condition its prompt also contains the other two models' annotations of the previous transcript, as few-shot examples.</li>
+<li><b>Prompting.</b> Each model receives an expert-annotator instruction, the codebook and the transcript, and must return structured JSON: a list of verbatim transcript passages, each labelled with a creative type.</li>
+<li><b>Two conditions.</b> In each iteration a new transcript is drawn and every model annotates it twice. In the baseline condition it works alone. In the feedback condition its prompt also contains the other two models' annotations of the previous transcript as few-shot examples, never its own.</li>
 <li><b>Runs.</b> Five independent runs of about forty iterations each.</li>
 </ul>
 
-<h2>The experiment loop</h2>
-<p>The loop shuffles the transcript pool once per run and walks through it, one transcript per iteration. Within an iteration it runs the baseline condition and then the feedback condition on the same transcript, calling every panel member in turn and saving each answer as its own JSON file, tagged with the iteration, transcript, model and condition.</p>
-<ul>
-<li><b>Peer annotations.</b> For the feedback prompt, each model receives the previous annotations of the two other members, never its own. These are appended after the transcript as two JSON blocks labelled as peer annotations of the previous sample.</li>
-<li><b>Two separate threads.</b> After the first iteration, only feedback-condition answers are carried forward as peer examples. The baseline condition never sees peer output, so the two conditions annotate the same transcripts but differ only in what is in the prompt.</li>
-<li><b>Start of a run.</b> The first iteration has no previous annotations, so it runs the baseline condition only, and its baseline answers seed the peer examples for the second iteration.</li>
-<li><b>Fault tolerance.</b> A response that is not valid JSON is stored as raw text rather than discarded, and an error from one model is logged without stopping the run.</li>
-</ul>
+<h2>Experiment design</h2>
+<p>Both conditions annotate the same transcript in every iteration, and only feedback-condition answers are carried forward as peer examples. The two conditions therefore differ only in what is in the prompt, which makes them directly comparable. The first iteration of each run has no previous annotations, so its baseline answers seed the peer examples for the second. Annotations are stored per model, iteration and condition, so the analysis can be rerun without calling the models again.</p>
 
 <h2>Measuring agreement</h2>
-<p>The analysis first cleans each stored response, stripping markdown code fences and any prose around the JSON. Each annotated passage is then located in the transcript by an exact word-sequence match, which turns it into a span of word positions. Passages that cannot be found verbatim are left out of the scoring, and an iteration in which any model's output cannot be parsed is skipped for that condition.</p>
-<p>Two annotations agree when they carry the same label and their word spans share at least one word; each annotation can be matched only once. True positives, false positives and false negatives are summed over every pair of models, giving one micro-averaged F1 per iteration and condition.</p>
-<p>Scores are averaged per iteration over the five runs, and only iterations with a score in both conditions are compared. The conditions are compared with a paired t-test after Shapiro-Wilk normality checks, and Kendall's tau tests for a trend over iterations.</p>
+<p>Each annotated passage is located in the transcript by exact word-sequence matching, which turns it into a span of word positions. Two annotations agree when they carry the same label and their spans overlap; each annotation can be matched only once. True positives, false positives and false negatives are summed over every pair of models, giving one micro-averaged pairwise F1 per iteration and condition as the inter-annotator agreement measure.</p>
+<p>Scores are averaged per iteration over the five runs. The conditions are compared with a paired t-test after Shapiro-Wilk normality checks, and Kendall's tau tests for a trend over iterations.</p>
 
 <h2>Results</h2>
 <figure><img src="/img/llm_panel_f1.png" alt="Line chart of pairwise F1 per iteration for the baseline and feedback conditions" loading="lazy"><figcaption>Agreement between the models (pairwise F1) per iteration, averaged over the five runs.</figcaption></figure>
@@ -75,11 +60,11 @@ data-analysis.py   averaged scores     -&gt;  normality checks, paired t-test, K
 <tr><td>Mean pairwise F1</td><td>0.185</td><td>0.216</td></tr>
 <tr><td>Iterations where the condition scored higher</td><td>11 of 39</td><td>28 of 39</td></tr>
 </table></div>
-<p>Seeing their peers' annotations made the models agree more (paired t-test, t(38) = 4.20, p &lt; 0.001), and the gain held in four of the five runs. Agreement did not trend up or down over the iterations in either condition, so the effect comes from the examples in the prompt rather than from a gradual drift.</p>
-<p>Agreement is not accuracy, though: a panel can converge on the same wrong label. An automated annotator like this needs a small human-verified set to calibrate against before it is trusted at scale.</p>
+<p>Seeing their peers' annotations made the models agree more (paired t-test, t(38) = 4.20, p &lt; 0.001), and the gain held in four of the five runs. Agreement showed no trend over the iterations in either condition, so the effect comes from the examples in the prompt rather than from a gradual drift.</p>
+<p>Agreement is not accuracy: a panel can converge on the same wrong label. An automated annotator like this needs a small human-verified set to calibrate against before it is used at scale.</p>
 
 <h2>My part</h2>
-<p>I wrote the experiment loop that runs the panel over the iterations and both conditions and passes the previous annotations around, and most of the prompt definitions. This included changing the loop so that both conditions run in every iteration on the same transcript. Other team members built the model wrappers, preprocessing, the agreement metric, the plots and the statistical analysis.</p>
+<p>I designed and wrote the experiment loop that runs the panel over the iterations and both conditions and routes the peer annotations between models, including running both conditions on the same transcript in every iteration, and wrote most of the prompts. Other team members built the model interfaces, preprocessing, the agreement metric, the plots and the statistical analysis.</p>
 
   </article>
   <aside class="p-side">

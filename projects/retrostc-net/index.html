@@ -34,41 +34,38 @@
   <article class="prose">
 
 <h2>Background</h2>
-<p>According to the synaptic tagging and capture (STC) hypothesis (Frey and Morris, 1997), learning first causes a short-lived synaptic change and leaves a temporary tag. The change becomes permanent only if plasticity-related products arrive while the tag is still present, and these can be triggered by a separate salient event. Behaviourally, an unfamiliar experience shortly before or after weak learning makes the weak memory last.</p>
-<p>This project implements that mechanism in standard backprop-trained networks, tests whether the behavioural-tagging time window appears, and uses the network's own consolidation record as an explanation of what it remembers. The motivation is that methods such as Elastic Weight Consolidation (EWC) and Synaptic Intelligence fix a weight's importance at the time of learning, whereas in many applications importance only becomes clear later, for instance when a fraud label or a user correction arrives. Whether retroactive consolidation helps in that setting is not tested here.</p>
-<h2>Contribution</h2>
-<p>Related mechanisms exist, such as a decaying weight component with tag-and-capture against forgetting (Leimer, Herzog and Senn, 2019), two-component weights in a backprop MLP consolidated by the size of the change (Li and van Rossum, 2020), and retroactive STC in spiking networks (Lehr, Luboeinski and Tetzlaff, 2022). What this project adds:</p>
+<p>The synaptic tagging and capture (STC) hypothesis (Frey and Morris, 1997) holds that learning leaves a short-lived change and a temporary tag, and the change becomes permanent only if plasticity-related products, which a separate salient event can trigger, arrive while the tag is present.</p>
+<p>This project implements the mechanism in backprop-trained networks, tests for the behavioural-tagging time window and uses the consolidation record as an explanation of what the network retains. Continual learning methods such as Elastic Weight Consolidation (EWC) and Synaptic Intelligence (SI) fix a weight's importance at learning time, whereas importance often becomes clear only later, for instance when a fraud label arrives.</p>
+<p>Building on related work on tag-and-capture and two-component weights (Leimer, Herzog and Senn, 2019; Li and van Rossum, 2020; Lehr, Luboeinski and Tetzlaff, 2022), this project adds:</p>
 <ul>
-<li>consolidation in a backprop-trained network that is decided retroactively, by a salience event occurring after learning;</li>
+<li>retroactive consolidation in a backprop-trained network, decided by a salience event after learning;</li>
 <li>a behavioural-tagging time-window test in network weights, including rescue of one task by another;</li>
-<li>a consolidation log that explains what the network retained, validated with a faithfulness test.</li>
+<li>a consolidation log as an explanation of what was retained, validated with a faithfulness test.</li>
 </ul>
 <h2>Method</h2>
-<p>Each weight is split into a consolidated part <code>L</code> and a labile part <code>E</code>, with effective weight <code>w = L + E</code>. The optimiser updates <code>w</code> as usual, so ordinary training code is unchanged; after each step the change is moved into <code>E</code> and:</p>
+<p>Each weight is split into a consolidated part <code>L</code> and a labile part <code>E</code>, with effective weight <code>w = L + E</code>. The optimiser updates <code>w</code> as usual, so standard training is unchanged; after each step the change is moved into <code>E</code> and the STC dynamics are applied:</p>
 <div class="table-wrap"><table>
-<tr><th>Biology</th><th>Network</th><th>Default</th></tr>
-<tr><td>Early-phase LTP decays</td><td><code>E ← E · exp(−1/τE)</code></td><td>τE = 1000 steps</td></tr>
-<tr><td>Synaptic tag</td><td><code>h ← h · exp(−1/τh) + |Δw|</code></td><td>τh = 150 steps</td></tr>
-<tr><td>Plasticity-related products, shared per neuron</td><td><code>p ← p · exp(−1/τp) + α·s(t)</code></td><td>τp = 80 steps</td></tr>
-<tr><td>Capture</td><td><code>c = clamp(κ · p · [h &gt; θ], 0, 1)</code>, then <code>L += c·E</code>, <code>E −= c·E</code></td><td>κ = 0.05, θ = 10⁻³</td></tr>
-<tr><td>Salient event</td><td><code>s(t)</code>: a pulse, or a sudden jump in training loss</td><td></td></tr>
+<tr><th>Biology</th><th>Network</th></tr>
+<tr><td>Early-phase LTP decays</td><td><code>E ← E · exp(−1/τE)</code></td></tr>
+<tr><td>Synaptic tag</td><td><code>h ← h · exp(−1/τh) + |Δw|</code></td></tr>
+<tr><td>Plasticity-related products, shared per neuron</td><td><code>p ← p · exp(−1/τp) + α·s(t)</code></td></tr>
+<tr><td>Capture</td><td><code>c = clamp(κ · p · [h &gt; θ], 0, 1)</code>, then <code>L += c·E</code>, <code>E −= c·E</code></td></tr>
+<tr><td>Salient event</td><td><code>s(t)</code>: a pulse, or a sudden jump in training loss</td></tr>
 </table></div>
-<p>Without an event nothing is captured and every learned change decays away. Capture needs a tag and products at the same step, which is what creates a time window around the event. In the default mode every unit receives the same pulse, so the products act as one global signal and the tags decide where capture happens. Two variants serve as ablations: products made only at synapses tagged at event time, and a separate tag for each learning episode's change instead of one per weight.</p>
-<p>Labile change is tracked per learning episode, so every consolidated change can be traced to the task that produced it and the event that captured it; the event attribution is exact when events do not overlap within the products' lifetime. Unit tests check, among other things, that the consolidated changes per episode add up exactly to the weight change.</p>
-<p>The main measure is the share of a task's learning that became permanent, the consolidated change projected onto the task's total change, <code>Σ(consolidated · change) / Σ(change²)</code>, used because accuracy saturates quickly on these tasks.</p>
+<p>Capture requires a tag and products at the same step, which creates a time window around the event; without an event every change decays. Ablations restrict products to tagged synapses and give each learning episode its own tag. Labile change is tracked per episode, so every consolidated change can be traced to its task and capturing event. The main measure is the consolidated share of a task's learning, <code>Σ(consolidated · change) / Σ(change²)</code>, since accuracy saturates quickly.</p>
 <h2>Results</h2>
-<p>Unless stated otherwise: an MLP with two hidden layers of 256 units, SGD, two binary MNIST tasks (A: 3 vs 5, B: 4 vs 9) and five seeds. Each run ends with 4000 steps without learning, so only consolidated memory remains: by then the labile part has decayed to under 2% of its value. The cross-task and log experiments use a separate output per task, so interference runs through the shared hidden layers.</p>
+<p>Setup: an MLP with two hidden layers of 256 units trained with SGD on two binary MNIST tasks (A: 3 vs 5, B: 4 vs 9), five seeds. Each run ends with 4000 steps without learning, so only consolidated memory remains. Multi-task experiments use a separate output head per task.</p>
 <h3>Event timing determines what is kept</h3>
 <figure><img src="/img/retrostc.png" alt="Share of task A consolidated and task A accuracy against the time of the salient event" loading="lazy"><figcaption>Share of task A that became permanent, by the time of a single salient event relative to the end of task A.</figcaption></figure>
-<p>Without an event nothing is kept, and accuracy on A falls from 0.95 to 0.61 after the delay; near the event it stays at about 0.95. The two sides of the window have separate causes, as STC predicts: tag lifetime mainly shifts the after-side, and the lifetime of the plasticity-related products mainly shifts the before-side. Because capture needs both, the window's shape follows from the time constants built into the model, so this experiment confirms that the mechanism works inside gradient training rather than showing that a window emerges on its own. Without tags an event at +600 steps still keeps 51%, and size-triggered capture keeps 62% with no event at all, so later events cannot change what it keeps.</p>
+<p>Without an event, accuracy on A falls from 0.95 to 0.61; near the event it stays at about 0.95. As STC predicts, tag lifetime mainly shifts the after-side of the window and product lifetime the before-side. Since the shape follows from the time constants, this confirms the mechanism works inside gradient training. Without tags, an event at +600 steps still keeps 51%, and size-triggered capture keeps 62% with no event, leaving later events no influence.</p>
 <h3>Cross-task rescue</h3>
 <figure><img src="/img/retrostc_cross_task.png" alt="Cross-task rescue results for different gaps between task A and task B" loading="lazy"></figure>
-<p>When task B's onset is salient, it rescues task A retroactively; without salience neither task is kept. With one tag per weight, B's own learning re-tags weights shared with A, so binding each episode's change to its own tag is needed for a clean window. With per-weight tags B's event still captures 24% of A at a 900-step gap; with per-change tags nothing is captured at that gap.</p>
+<p>A salient onset of task B rescues task A retroactively; without salience neither is kept. With per-weight tags, B re-tags shared weights and still captures 24% of A at a 900-step gap; per-change tags give a clean window.</p>
 <h3>The consolidation log as an explanation</h3>
 <figure><img src="/img/retrostc_faithfulness.png" alt="Deletion test comparing the consolidation log, Fisher importance and random selection" loading="lazy"></figure>
-<p>Faithfulness is tested by deletion: parameters are ranked by the log's attribution, by Fisher importance, by the total change each task made to them, or at random, and the top-ranked ones are reset to their pre-learning values. Removing the 5% of parameters the log attributes to task A drops accuracy on A from 0.87 to 0.80 while sparing B; removing B's drops B from 0.97 to 0.69 while sparing A. Fisher importance separates the two memories far less clearly. Ranking by change size is a stronger baseline: for task A it matches the log (0.796 against 0.797), and only for task B does the log do better (0.691 against 0.764), so what consolidation adds to the explanation is visible for B.</p>
+<p>Faithfulness is evaluated with a deletion test: parameters are ranked by the log's attribution, Fisher importance, change size or at random, and the top 5% are reset to pre-learning values. Removing the log's task A parameters drops A from 0.87 to 0.80 while sparing B; removing B's drops B from 0.97 to 0.69 while sparing A. Fisher importance separates the memories far less clearly. Change size matches the log for A (0.796 against 0.797); the log does better for B (0.691 against 0.764).</p>
 <h3>Forgetting on Split-MNIST</h3>
-<p>Five binary tasks are learned in sequence. In the surprise-gated variants, an event fires when the training loss exceeds its running mean by three standard deviations, with settings fixed in advance and no task labels.</p>
+<p>Five binary tasks are learned in sequence. Surprise-gated variants fire an event when training loss exceeds its running mean by three standard deviations, without task labels.</p>
 <figure><img src="/img/retrostc_splitmnist.png" alt="Split-MNIST accuracy for plain SGD, EWC, Synaptic Intelligence and STC variants" loading="lazy"></figure>
 <div class="table-wrap"><table>
 <tr><th>Method</th><th>Task-incremental</th><th>Domain-incremental</th></tr>
@@ -78,13 +75,15 @@
 <tr><td>STC, surprise-gated</td><td>0.980</td><td>0.621</td></tr>
 <tr><td>STC log as importance, surprise-gated</td><td>0.980</td><td>0.636</td></tr>
 </table></div>
-<p>STC alone does not measurably reduce forgetting: it decides what becomes permanent, but consolidated weights are not protected from later learning. Using the consolidation log as importance in an EWC-style penalty reaches EWC level, with importance selected by surprising events after learning rather than fixed during it. It does not outperform Synaptic Intelligence. The detector also caught a task change within 20 steps in at most 3 of the 4 changes, so the result does not show that surprise picks the right moments.</p>
+<p>STC alone does not measurably reduce forgetting, since consolidated weights are not protected from later learning. Using the consolidation log as importance in an EWC-style penalty reaches EWC level, with importance selected by surprising events after learning rather than fixed during it. It does not outperform Synaptic Intelligence.</p>
 <h2>Limitations</h2>
 <ul>
 <li>Small MLPs on MNIST only; the results demonstrate the mechanism, not performance at scale.</li>
 <li>Time is measured in training steps, and time constants were set by hand.</li>
-<li>The deletion test resets weights without retraining, and the surprise detector reacts to loss noise as well as to task changes.</li>
-<li>The biological mapping is simplified: backprop is not a biological learning rule, and a hidden unit is not a neuron.</li>
+<li>The deletion test resets weights without retraining.</li>
+<li>The surprise detector also reacts to loss noise, catching a task change within 20 steps in at most 3 of 4 cases.</li>
+<li>Settings with delayed labels are not tested.</li>
+<li>The biological mapping is simplified.</li>
 </ul>
 
   </article>
