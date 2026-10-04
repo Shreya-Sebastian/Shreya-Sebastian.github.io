@@ -39,7 +39,7 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>An augmented reality demo that runs entirely in the browser from the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time; the gesture is recognised from those landmarks, and an effect is drawn on a canvas overlay that follows the hand.</p>
+<p>An augmented reality demo that runs entirely in the browser from the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time; the gesture is recognised from those landmarks, and an effect is drawn on a canvas overlay that follows the hand. It is plain JavaScript with Canvas 2D drawing and no build step.</p>
 <div class="table-wrap"><table>
 <tr><th>Gesture</th><th>Effect</th></tr>
 <tr><td>Open palm</td><td>Wind: particles orbiting the palm on three elliptical rings</td></tr>
@@ -48,17 +48,25 @@
 <tr><td>Pinch</td><td>Ice: orbiting snowflakes and expanding ripples</td></tr>
 <tr><td>Peace sign</td><td>Fire: rising flame particles</td></tr>
 </table></div>
+
+<h2>Pipeline</h2>
+<pre>camera -&gt; MediaPipe landmarks -&gt; gesture rules -&gt; smoothing
+       -&gt; active effect -&gt; palm anchor and scale -&gt; particles</pre>
+<p>Two loops run side by side. MediaPipe reports landmarks whenever a camera frame has been processed, while a separate animation loop redraws the canvas on every display frame from the most recent landmarks. The camera image is drawn mirrored and the landmarks are flipped to match, and a small preview shows the tracked hand skeleton.</p>
+
 <h2>Recognising gestures</h2>
 <ul>
 <li>A finger counts as raised when its tip is above its middle joint. Pinch is checked first, as a small distance between the thumb tip and the index tip.</li>
-<li>The other gestures follow from which fingers are raised: all four for an open palm, index and middle for peace, only the index for pointing, none for a fist.</li>
-<li>To avoid flicker, the label is a majority vote over the last five frames, and a gesture has to hold for 300 ms before its effect starts.</li>
+<li>The other gestures follow from which fingers are raised: all four for an open palm, index and middle for peace, only the index for pointing, none for a fist. Any other combination counts as no gesture.</li>
+<li>To avoid flicker, the label is a majority vote over the last five frames, and a gesture has to hold for 300 ms before its effect starts. Once started, an effect stays on until a different gesture is held.</li>
 </ul>
+
 <h2>Rendering</h2>
 <ul>
-<li>Effects are anchored to the centre of the palm (lightning to the index fingertip) and scale with the size of the hand in the image, so they look the same close to the camera or far away.</li>
+<li>Effects are anchored to the centre of the palm (lightning to the index fingertip) and scale with the size of the hand in the image, so they look the same close to the camera or far away. The anchor is the mean of the wrist and the four finger bases; the scale is the distance from the wrist to the base of the middle finger, and sizes, speeds and orbit radii in every effect are multiples of it.</li>
 <li>Each element is a small particle system with its own update and draw step: fire uses short-lived particles with velocity damping, lightning regenerates a recursive midpoint-displacement bolt several times a second, and ice draws its snowflakes procedurally.</li>
-<li>The frame time step is capped, dead particles are removed every frame and effect objects are reused, which keeps the animation smooth.</li>
+<li>Wind moves 18 particles around three elliptical rings. Earth orbits six rotating rock fragments while dust falls back under gravity. Each lightning bolt is drawn twice, a wide translucent stroke for the glow and a thin white core, and releases a burst of sparks. Ice adds two ripples that expand from the palm half a cycle apart.</li>
+<li>The frame time step is capped, dead particles are removed every frame and effect objects are reused, which keeps the animation smooth. A code comment gives the reason for the cap: without it, a tab switch would produce one very large jump.</li>
 </ul>
 
   </article>
