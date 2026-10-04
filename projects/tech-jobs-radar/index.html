@@ -36,6 +36,7 @@
 <h2>Overview</h2>
 <p>Tech Jobs Radar lists tech, software, data and IT vacancies in the Netherlands, read directly from employers' own career sites. Each posting is tagged with the skills, seniority, experience and degree it asks for, its language, whether Dutch is required, visa sponsorship and remote policy. Every listing links back to the employer's original page.</p>
 <p>The site has been live since 29 September 2026. Optional accounts keep a profile and saved jobs across devices.</p>
+
 <h2>How it works</h2>
 <pre>sources ─► queue ─► workers + adapters ─► normalise, filter, dedup ─► classify, extract ─► Postgres ─► API ─► site</pre>
 <ul>
@@ -44,16 +45,43 @@
 <li><b>Processing.</b> A Netherlands-only filter, duplicate merging, lifecycle tracking and periodic link checks, followed by a rule-based classifier and extractor that fill a typed schema.</li>
 <li><b>Serving.</b> A FastAPI JSON API with a response cache, and a plain JavaScript front end with Chart.js and D3.</li>
 </ul>
+<p>Every adapter turns a board's response into the same raw posting record, so everything after the fetch is independent of the source. The crawl steps are plain functions, so the same code runs from a queue worker, from a single local process without Redis, and from the tests.</p>
+
+<h2>Method</h2>
+<h3>Crawling</h3>
+<p>Every 15 minutes the sources that are due are queued. How often a source is due depends on how many Dutch postings it had last time, and sitemap sources, read page by page, are crawled at most every six hours. A source that returns "not found", or fails five times in a row, is switched off. Rate limits are counted per host in one-second windows in Redis, so all workers share one budget, and boards on one multi-tenant platform share a limit because such platforms rate-limit by IP across all their customers. robots.txt is matched as Google and Bing match it (the longest rule wins), since Python's standard parser takes the first match and would read "disallow everything, allow /careers" as a ban on the careers pages.</p>
+
+<h3>Lifecycle</h3>
+<p>Each posting is normalised into canonical fields, including a duplicate key from employer, title and city and a hash of its content; it is classified and extracted when new, and again only when that hash changes. Postings no longer listed are closed, with two guards. If a board that had at least ten postings suddenly returns fewer than half as many, the response is treated as partial and nothing is closed. And an employer's expiry date is ignored for a source when more than 80% of its dated postings look expired, as the field is then a broken template value.</p>
+
+<h3>Duplicates</h3>
+<p>Duplicates are linked to one canonical posting rather than deleted, by six rules: the same employer, title and city on another source; identical text under URLs that differ only by a repost counter; the same original URL; the Dutch and English copies of one vacancy; one vacancy published once per city, recognised by identical text once city names and numbers are removed; and the same page under another language segment in its URL. The employer's own copy is preferred over an agency's. Dutch and English copies are paired within a source when they share a day and city and either their titles are near-identical or they share most of their numbers (salary, hours, reference numbers), one-to-one, so two Dutch jobs cannot collapse onto one English job.</p>
+
+<h3>Classification and extraction</h3>
+<p>The tech classifier scores the title by rules, with an exclusion list (sales, HR, finance, mechanical engineering and similar) and phrases that keep a title technical despite an excluded word ("Sales Engineer"). A title that only says "Engineer", "Scientist" or "Analyst" counts as tech only when the role text shows hands-on software, IT or data work.</p>
+<p>The extractor fills a typed Pydantic schema. It first splits a posting into the part about the job and the part about the company, using Dutch and English section headers, and reads skills only from the job part, because company introductions often name the employer's own products, which are not requirements. Requirements are read clause by clause: "Dutch is a plus" is not a Dutch requirement, office days in the same sentence make "remote" hybrid, and a negation applies only within its clause. The rules carry a version number, bumped on every change, so stored postings can be extracted again. A second extractor, using an LLM with structured outputs into the same schema, is implemented but has not been used in production or evaluated against the rules.</p>
+
+<h2>Design choices</h2>
+<ul>
+<li><b>Rules as the baseline.</b> The code describes the rule-based extractor as cheap, deterministic and the baseline any LLM extractor would have to beat on the golden set.</li>
+<li><b>Career sitemaps.</b> Many large Dutch employers run their own career site rather than a public tracking board, but publish <code>JobPosting</code> data because Google for Jobs requires it.</li>
+<li><b>Periodic jobs inside the worker.</b> A Kubernetes CronJob starts a new Python process for every run, which on a small node can push the machine into swap. A thread in the worker queues each periodic job instead, claiming each time slot in Redis so that several workers never queue the same run twice.</li>
+</ul>
+
 <h2>Evaluation</h2>
-<p>The extractor is scored field by field against a golden set of postings, built by correcting the rule outputs. Scalar fields are scored by exact match and skill lists by precision, recall and F1. Every push runs this evaluation in CI, and the build fails if the score drops below a threshold, so a rule change cannot quietly make the extraction worse.</p>
+<p>The extractor is scored field by field against a golden set of postings, built by correcting the rule outputs. Scalar fields are scored by exact match and skill lists by precision, recall and F1. Every push runs this evaluation in CI, and the build fails if the score drops below a threshold, so a rule change cannot quietly make the extraction worse. The golden set holds 46 postings, and the threshold is 0.70 on the mean of nine field accuracies and the skills F1.</p>
+<p>A second gate covers the site's filters: 500 live postings, of which 300 may be used to tune the rules and 200 are only scored. Each filter is measured as it is used, with 95% confidence intervals; for the "English, no Dutch required" filter, for example, the share of shown jobs that really need no Dutch.</p>
 <p>Classifying tech roles is a heavily imbalanced problem, with some categories that occur only rarely, which is part of why the scores are tracked per field rather than as one number.</p>
+
 <h2>Deployment</h2>
-<p>Production runs on k3s on a single AWS EC2 instance, deployed with a Helm chart, with the AWS resources defined in Terraform. Every push to main runs the tests and evaluation gates in GitHub Actions and builds an image tagged with the commit; Flux in the cluster then upgrades the release from Git and rolls it back if the new pods do not become ready. Prometheus collects metrics, and the database is backed up to S3 every night.</p>
+<p>Production runs on k3s on a single AWS EC2 instance, deployed with a Helm chart, with the AWS resources defined in Terraform. Every push to main runs the tests and evaluation gates in GitHub Actions and builds an image tagged with the commit; Flux in the cluster then upgrades the release from Git and rolls it back if the new pods do not become ready. The image tag goes to a separate deploy branch that Flux follows, so main holds only authored commits. Prometheus collects metrics, and the database is backed up to S3 every night.</p>
+
 <h2>Running it in production</h2>
 <ul>
-<li><b>Memory.</b> The whole service has to fit in 2 GB. Out-of-memory kills were fixed by moving periodic jobs into the worker, setting memory limits and batching the duplicate pass.</li>
-<li><b>Inherited connections.</b> After launch, forked queue jobs inherited the parent's Postgres connections and scheduled crawls failed. The fix discards inherited connection pools in each process; a test covers it, and an alert now fires when crawl volume drops.</li>
+<li><b>Memory.</b> The whole service has to fit in 2 GB. Out-of-memory kills were fixed by moving periodic jobs into the worker, setting memory limits and batching the duplicate pass; one change cut that pass from about 530 MB to about 190 MB.</li>
+<li><b>Inherited connections.</b> After launch, forked queue jobs inherited the parent's Postgres connections and scheduled crawls failed. The fix discards inherited connection pools in each process; a test covers it, and an alert now fires when crawl volume drops. The alert runs in the worker's own timer thread, since a failing queued job could not report the failure.</li>
 </ul>
+
 <h2>Data and terms</h2>
 <p>Only public job board APIs and careers pages are read. LinkedIn, Indeed and Glassdoor are not, as their terms prohibit automated access; aggregators are left out, and sites that block the crawler are not crawled. Contact details are removed from posting text before it is stored.</p>
 
