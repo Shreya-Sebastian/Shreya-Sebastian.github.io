@@ -34,28 +34,21 @@
   <article class="prose">
 
 <h2>Overview</h2>
-<p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally and stores everything in a DuckDB file. Most of the work turned out to be in the data itself: working out who a payment went to, and measuring how often that goes right.</p>
+<p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally on DuckDB. The core problems are entity resolution (working out who a payment went to) and periodicity detection, both measured against labelled synthetic data.</p>
 
 <h2>Structure</h2>
 <pre>bank export ─► importer ─► transactions ─► DuckDB ─► merchant resolution ─► recurring detection ─► report</pre>
-<p>Each bank has its own parser, and all of them produce the same transaction record, including the source file and row, so any result can be traced back to its line in the export. The bank is detected from the file itself. ABN AMRO's export has no counterparty column, so the name and IBAN are parsed out of a fixed-width description field. Each transaction gets an id built from its contents, so importing the same file twice, or two exports with overlapping dates, does not create duplicates; identical payments on the same day are numbered so they stay distinct.</p>
+<p>Per-bank parsers map each format onto a common transaction schema with full provenance, so any result can be traced back to its line in the export. Each transaction gets a content-based id, which makes imports idempotent: re-imported files and overlapping exports do not create duplicates.</p>
 
 <h2>Merchant resolution</h2>
-<p>One shop shows up under many names: branch numbers, city suffixes, payment terminal prefixes, provider wrappers and names cut off at 22 characters. Each name is normalised, and names are then merged if they share a counterparty IBAN, have a high fuzzy-match score, are a truncated version of another name or match as an acronym.</p>
-<p>Normalisation strips terminal and provider prefixes, "on behalf of" wrappers, legal forms, city names (including ones cut off mid-word) and any token containing a digit. The resulting keys are merged with union-find: a shared IBAN first, as the strongest signal, then pairwise similarity (prefix, word containment ignoring generic words such as "restaurant", acronym, or a RapidFuzz score of 90 or more). Each merchant is named after the longest readable variant used for a fair share of its payments, since statement names are abbreviated far more often than padded. A merchant that switched names part-way through, without the names interleaving, takes the newer name. Shops seen only under a holding company's legal name are left unnamed by design and appear as naming misses in the evaluation.</p>
+<p>One shop shows up under many names: branch numbers, city suffixes, payment terminal prefixes, provider wrappers and names truncated at 22 characters. Each name is first normalised by stripping prefixes, legal forms, city names and tokens containing digits. The resulting keys are then clustered with union-find, merging first on a shared counterparty IBAN as the strongest signal and then on pairwise similarity: prefix and word containment, acronym matching and a RapidFuzz score of 90 or more. Each cluster is named after its longest readable variant used for a fair share of its payments.</p>
 
 <h2>Recurring payments</h2>
-<p>Payments are grouped by merchant, type and direction, split into amount bands and tested against weekly, four-weekly, monthly, quarterly and yearly schedules. It handles four-weekly billing, small price changes, stopped payments, subscriptions mixed with one-off purchases at one merchant, and two subscriptions under a single name.</p>
-<ul>
-<li><b>Schedules.</b> A band fits a schedule when at least three quarters of the gaps between payments fall within that schedule's tolerance; the best fit is the one with the smallest median error. Four-weekly is separate because gyms often charge every 28 days, which is 13 payments a year.</li>
-<li><b>Hidden subscriptions.</b> When a band does not fit, each exact amount is tried on its own, so a monthly fee is found among one-off purchases at the same merchant.</li>
-<li><b>Price changes.</b> A series counts as one price within 3%, but changes are found on exact amounts, because fixed charges repeat to the cent and a rent rise can be only 3%. A single odd amount in the middle is ignored.</li>
-<li><b>Yearly renewals.</b> One pair of payments a year apart counts only if nothing else from that merchant is in the data; otherwise two equal supermarket receipts would look like a subscription.</li>
-</ul>
+<p>Payments are grouped by merchant, type and direction, split into amount bands and tested against weekly, four-weekly, monthly, quarterly and yearly schedules. A band fits a schedule when at least three quarters of the gaps fall within its tolerance, and the best fit is the one with the smallest median error. Further rules recover a subscription hidden among one-off purchases at the same merchant by testing exact amounts separately, treat amounts within 3% as one price while detecting price changes on exact amounts, and handle stopped payments and two subscriptions under a single name.</p>
 
 <h2>Evaluation</h2>
-<p>A generator produces 18 months of synthetic transactions with the correct answers stored alongside, in all four banks' formats. There are two sets: a development set written alongside the rules, and a held-out set written separately, without access to the matching code, with extra kinds of messiness. The held-out set is used only for reporting; once the rules change because of something seen in it, it no longer counts as unseen and the next version gets a fresh one.</p>
-<p>Grouping is scored with B-cubed F1, which credits each transaction for how well its predicted group matches its true group. Results are over 6 random seeds and 4 bank formats, about 1,050 transactions per file.</p>
+<p>A generator produces 18 months of synthetic transactions with ground-truth labels, in all four banks' formats. There are two sets: a development set written alongside the rules, and a held-out set written separately, without access to the matching code, with additional kinds of noise. The held-out set is used only for reporting and is replaced once the rules are changed in response to it.</p>
+<p>Grouping is scored with B-cubed F1, which credits each transaction for how well its predicted cluster matches its true cluster. Results are over 6 random seeds and 4 bank formats, about 1,050 transactions per file.</p>
 <div class="table-wrap"><table>
 <tr><th></th><th>Development</th><th>Held-out</th></tr>
 <tr><td>Merchant grouping (B-cubed F1)</td><td>1.000</td><td>0.952 to 0.961</td></tr>
@@ -63,10 +56,7 @@
 <tr><td>Recurring series found (precision / recall)</td><td>1.000 / 1.000</td><td>0.944 to 1.000 / 0.944</td></tr>
 <tr><td>Price changes and cancellations detected</td><td>100%</td><td>100%</td></tr>
 </table></div>
-<p>The held-out numbers are the ones to believe. Most of the remaining errors come from payment providers whose shared IBAN joins unrelated shops, and from branch numbers glued to shop names. The one missed recurring series is a yearly payment that occurs only once in the 18 months.</p>
-
-<h2>Next steps</h2>
-<p>The next rule changes follow from these failures: stop trusting IBANs that belong to known payment providers, split branch numbers off glued names and handle Dutch abbreviations, then measure on a new held-out set.</p>
+<p>The held-out numbers are the reference figures. The remaining grouping errors come mainly from payment-provider IBANs shared by unrelated shops and from branch numbers attached to shop names, which point to the next refinements of the resolution rules.</p>
 
   </article>
   <aside class="p-side">
