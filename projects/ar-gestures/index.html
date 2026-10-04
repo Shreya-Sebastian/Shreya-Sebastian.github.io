@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=1c58edbb">
+<link rel="stylesheet" href="/assets/style.css?v=a9d416f8">
 </head>
 <body>
 <nav class="nav" aria-label="Main">
@@ -38,8 +38,10 @@
 <div class="container p-layout">
   <article class="prose">
 
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A browser-based augmented reality demo, built by me, that recognises five hand gestures from the webcam and renders a matching particle effect that follows the hand.</li><li>MediaPipe Hands provides 21 hand landmarks per frame, geometric rules classify the gesture, and a five-frame majority vote with a 300 ms hold suppresses flicker.</li><li>Each effect is a separate particle system on a Canvas 2D overlay (emission with damping, orbital motion, recursive midpoint displacement, gravity, procedural snowflakes), anchored to the palm and scaled by hand size so it stays consistent at any distance from the camera.</li><li>It runs in real time in plain JavaScript with no build step, using a frame-rate independent update with a capped time step.</li></ul></div>
+
 <h2>Overview</h2>
-<p>A browser-based augmented reality demo driven by the webcam. MediaPipe Hands tracks 21 hand landmarks in real time, a rule-based recogniser classifies the gesture from their geometry, and a particle effect is rendered on a canvas overlay that follows the hand. It is written in plain JavaScript with Canvas 2D rendering and no build step.</p>
+<p>A browser-based augmented reality demo driven by the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time, a rule-based recogniser classifies the gesture from their geometry, and a particle effect is rendered on a canvas overlay that follows the hand. It is written in plain JavaScript with Canvas 2D rendering and no build step.</p>
 <div class="table-wrap"><table>
 <tr><th>Gesture</th><th>Effect</th></tr>
 <tr><td>Open palm</td><td>Wind: particles orbiting the palm on three elliptical rings</td></tr>
@@ -52,13 +54,37 @@
 <h2>Pipeline</h2>
 <pre>camera -&gt; MediaPipe landmarks -&gt; gesture rules -&gt; smoothing
        -&gt; active effect -&gt; palm anchor and scale -&gt; particles</pre>
-<p>Tracking and rendering are decoupled: MediaPipe delivers landmarks asynchronously as camera frames are processed, while a separate animation loop redraws the canvas on every display frame from the latest landmarks. The camera image is mirrored and the landmarks flipped to match.</p>
+<p>Tracking and rendering are decoupled. MediaPipe processes 640 by 480 camera frames and delivers landmarks asynchronously whenever a frame is done, at which point the gesture is classified and the palm anchor updated. A separate animation loop redraws the canvas on every display frame from the most recent landmarks, so the effects animate at the display rate even when tracking runs slower.</p>
+
+<h2>Hand tracking</h2>
+<p>MediaPipe Hands is configured for a single hand, with a detection confidence threshold of 0.72 for finding a hand and a lower tracking threshold of 0.55 for following it once found. Each landmark comes in normalised image coordinates, with x and y in [0, 1] and y increasing downwards.</p>
+<p>Users expect a webcam view to behave like a mirror, so the camera image is drawn flipped horizontally and every landmark is mapped to canvas coordinates as <code>((1 − x)·W, y·H)</code>, which keeps the effects aligned with the mirrored hand. When no hand is detected, the anchor is cleared and nothing is drawn.</p>
 
 <h2>Gesture recognition</h2>
-<p>A finger counts as raised when its tip lies above its middle joint, and a pinch is detected from the distance between thumb and index tips. The remaining gestures follow from which fingers are raised. For temporal stability, the label is a majority vote over the last five frames, and a gesture must hold for 300 ms before its effect starts; an effect then persists until a different gesture is held.</p>
+<h3>Geometric rules</h3>
+<p>A finger counts as raised when its tip lies above its middle (PIP) joint in the image, which is a direct comparison of two y coordinates. Index, middle, ring and little finger are tested this way. The gestures then follow from which fingers are raised: all four for an open palm, index and middle for a peace sign, only the index for pointing and none for a fist. Any other combination counts as no gesture.</p>
+<p>A pinch is detected from the Euclidean distance between the thumb tip and the index tip, with a threshold of 0.06 in normalised units. It is checked first because it is defined by the thumb and index alone, independent of the other fingers: during a pinch the remaining fingers may be raised or folded, and the finger-count rules, which ignore the thumb, would otherwise read the same hand as an open palm, a fist or no gesture.</p>
+<h3>Temporal smoothing</h3>
+<p>Per-frame labels flicker when a finger sits close to its threshold or a landmark jitters. Two filters stabilise them. First, the label is a majority vote over the last five frames, which removes isolated misclassifications. Second, a smoothed label must hold for 300 ms before its effect starts, and the hold timer restarts whenever the smoothed label changes. Once started, an effect persists until a different gesture is held, so a brief loss of the gesture does not switch it off.</p>
+<p>The trade-off is latency against stability. The vote lags a real change by a few frames and the hold adds 300 ms, so a new effect starts a moment after the hand changes shape; in return, transitional hand shapes between two gestures do not trigger effects in passing.</p>
 
 <h2>Rendering</h2>
-<p>Effects are anchored to the palm centre, the mean of the wrist and the four finger bases, and scaled by the wrist to middle-finger-base distance, so sizes, speeds and orbit radii stay consistent as the hand moves towards or away from the camera. Each element is its own particle system with update and draw steps: fire uses short-lived particles with velocity damping, lightning regenerates recursive midpoint-displacement bolts drawn with a glow stroke and a thin core, earth combines orbiting fragments with gravity-driven dust, and ice draws procedural snowflakes. The frame time step is capped, dead particles are culled every frame and effect objects are reused, which keeps the animation smooth.</p>
+<h3>Palm anchoring and scale invariance</h3>
+<p>Effects are anchored to the palm centre, computed as the mean of the wrist and the four finger bases; lightning alone is anchored to the index fingertip. The scale is the distance from the wrist to the base of the middle finger in canvas pixels, with a lower bound. Sizes, speeds, emission spread and orbit radii in every effect are expressed as multiples of this scale, so an effect looks the same whether the hand is close to the camera or far away.</p>
+<h3>Particle systems</h3>
+<p>Each element is its own particle system with an update step that advances the state by the elapsed time and a draw step that renders it around the current anchor.</p>
+<ul>
+<li><b>Fire.</b> Particles are emitted at a rate proportional to the frame time, so emission is independent of the frame rate, with upward velocities and a small horizontal spread. Vertical velocity is damped every frame, each particle lives for about half a second to a second, with a hue between red and orange and lightness, size and opacity that fall as it ages.</li>
+<li><b>Wind.</b> Eighteen particles orbit the palm on three elliptical rings, flattened vertically to suggest a ring seen at an angle. Each has its own angular speed and a sinusoidal modulation of its radius, and its opacity varies with its phase.</li>
+<li><b>Lightning.</b> A new bolt is generated every 70 to 180 ms in a random direction around the vertical, by recursive midpoint displacement: the midpoint of a segment is offset randomly in proportion to the segment's length, and both halves are subdivided again, to a depth of four. Each bolt is drawn twice, a wide translucent stroke for the glow and a thin white core, and releases a burst of sparks whose velocity decays quickly.</li>
+<li><b>Earth.</b> Six irregular rock fragments in earth tones orbit the palm on an ellipse while rotating about their own centres, and dust particles are spawned at random, drift upwards and fall back under a constant gravitational acceleration.</li>
+<li><b>Ice.</b> Ten snowflakes orbit at three radii, each drawn procedurally as six arms with two side branches at 60 degrees, and rotate slowly. Two ripples expand from the palm half a cycle apart, fading as they grow.</li>
+</ul>
+<h3>Frame-time handling</h3>
+<p>All motion is integrated with the measured time between display frames, so speeds are the same on displays with different refresh rates. The time step is capped at 50 ms, so that a long pause, such as switching browser tabs, produces one bounded step instead of a large jump. Dead particles are culled every frame, and the five effect objects are created once and reused when a gesture returns, which keeps allocation low and the animation smooth.</p>
+
+<h2>Scope</h2>
+<p>The recogniser is rule-based and tracks one hand. The finger rules compare vertical positions, so they assume a roughly upright hand facing the camera.</p>
 
   </article>
   <aside class="p-side">

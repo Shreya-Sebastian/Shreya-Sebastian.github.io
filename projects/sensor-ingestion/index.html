@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=1c58edbb">
+<link rel="stylesheet" href="/assets/style.css?v=a9d416f8">
 </head>
 <body>
 <nav class="nav" aria-label="Main">
@@ -33,20 +33,31 @@
 <div class="container p-layout">
   <article class="prose">
 
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A proof of concept for loss-free sensor data ingestion in a smart home architecture, built for the TU Delft Software Architecture course, where I built most of the proof of concept and wrote the report sections on it.</li><li>Sensors use store-and-forward with a persistent local buffer and chunked resynchronisation, sending readings over HTTP to a FastAPI service that validates them with Pydantic and publishes them to a durable RabbitMQ queue read by acknowledging consumers.</li><li>Fault-injection scenarios, unit tests with mocked HTTP failures and load tests (5,000 readings in one request, 200 concurrent requests, 1,000 messages from 50 sensors) confirm that every disconnected sensor empties its buffer and every request is accepted.</li><li>A three-stage GitLab CI pipeline runs style checks, builds the Docker image and runs all tests inside it against a RabbitMQ service.</li></ul></div>
+
 <h2>Context</h2>
-<p>For the Software Architecture course our team designed a smart home system that learns household routines from sensor data, split into a local hub and a set of cloud services. The proof of concept tests one part of that architecture: delivering sensor readings to the backend without loss when the home's network connection drops. I built most of the proof of concept and wrote the report sections on it.</p>
-<p>It targets the design's availability and scalability goals, and two problems in particular: <b>data loss during outages</b>, when a sensor sends directly to a server, and <b>tight coupling</b>, when a slow processor stalls ingestion. Availability is defined as sensors continuing to produce readings while disconnected, with every reading reaching the queue once the connection returns.</p>
+<p>For the Software Architecture course our team designed a smart home system that learns household routines from sensor data. To keep sensitive data under the user's control while still allowing remote access, the design splits the system into a local hub, which handles data collection, storage, routine learning and device communication, and a set of cloud services for remote access, authentication, updates and notifications. The hub follows a microkernel architecture, with a core and independent plug-ins, and the cloud side a microservice architecture. I built most of the proof of concept and wrote the report sections on it.</p>
+<p>The proof of concept tests one component of the hub's network module: delivering sensor readings to the backend without loss when the home's network connection drops. It targets the design's availability and scalability goals, and two problems in particular:</p>
+<ul>
+<li><b>Data loss during outages.</b> A sensor that sends directly to a server loses its readings when the connection drops.</li>
+<li><b>Tight coupling.</b> If the service that receives readings also processes them, a slow or failed processor stalls ingestion.</li>
+</ul>
+<p>Availability is defined as sensors continuing to produce readings while disconnected, with every reading reaching the queue once the connection returns.</p>
+
 <h2>Architecture</h2>
 <figure><img src="/img/sensor_poc_architecture.png" alt="Sensors with local buffers send HTTP requests to an ingestion server, which publishes to a message queue read by a consumer" loading="lazy"><figcaption>Sensors send readings over HTTP to the ingestion server, which publishes them to a queue; each sensor keeps a local buffer for when the connection is down.</figcaption></figure>
+<pre>sensor (buffer) -> HTTP batch -> ingestion service (validate) -> durable queue -> consumer (ack)</pre>
 <ul>
-<li><b>Ingestion service.</b> A FastAPI REST endpoint that accepts batches of readings, validates them against a Pydantic schema and publishes them to RabbitMQ, returning 503 when the broker is unreachable. Its role is kept minimal (accept, validate, forward), so malformed data never enters the queue.</li>
+<li><b>Ingestion service.</b> A stateless FastAPI REST endpoint that accepts a batch of readings, validates each against a Pydantic schema (reading identifier, sensor identifier, type, value and timestamp) and publishes it to RabbitMQ as a persistent message. It returns 503 when the broker is unreachable, so the sensor treats a broker outage like a network outage, and exposes a health endpoint.</li>
 <li><b>Message queue.</b> A durable RabbitMQ queue with persistent messages decouples ingestion from processing, absorbs bursts and survives broker restarts.</li>
-<li><b>Consumer.</b> Uses manual acknowledgement after processing, so unacknowledged messages are requeued, and scales horizontally as competing consumers on the same queue.</li>
-<li><b>Sensors.</b> Simulated sensors implement store-and-forward with a persistent local buffer that survives a restart.</li>
+<li><b>Consumer.</b> Takes one message at a time (a prefetch of one, for fair dispatch) and acknowledges it only after processing, reconnecting automatically when the broker is lost.</li>
+<li><b>Sensors.</b> Simulated sensors generate a reading every one to two seconds and implement store-and-forward with a persistent local buffer.</li>
 </ul>
-<p>The broker, ingestion service and consumer run as separate containers under Docker Compose.</p>
+<p>The design choices follow from the two problems. Keeping the ingestion service's role minimal (accept, validate, forward) lets it handle many concurrent connections without being slowed by processing, and validation at entry acts as a gateway, so malformed data never enters the queue. The queue lets ingestion and processing scale independently, and since all consumers read from the same queue as competing consumers, processing capacity scales horizontally by adding instances. Manual acknowledgement gives at-least-once delivery between queue and consumer: if a consumer fails before acknowledging, the broker requeues the message.</p>
+<p>The broker, ingestion service and consumer run as separate containers under Docker Compose, and the services start only once the broker passes its health check.</p>
+
 <h2>Transport choice</h2>
-<p>The report compares four transports between sensors and the ingestion service:</p>
+<p>The report compares four transports between sensors and the ingestion service, judged on reliability under intermittent connectivity, observability and operational complexity:</p>
 <div class="table-wrap"><table>
 <tr><th>Protocol</th><th>For</th><th>Against</th></tr>
 <tr><td>REST</td><td>Firewall friendly; simple request and response with explicit chunked backlog upload; easy validation and backoff</td><td>More overhead per message than MQTT; not a push protocol</td></tr>
@@ -55,17 +66,28 @@
 <tr><td>UDP</td><td>Lightweight; suits constrained networks</td><td>Network traversal; harder to observe</td></tr>
 </table></div>
 <p>REST was chosen for its ease of handling and its suitability for a smart home application.</p>
+
 <h2>Buffering and resynchronisation</h2>
-<p>On a connection or server error the sensor goes offline and appends readings to its buffer. On reconnection it drains the backlog oldest first in fixed-size chunks interleaved with live data, removing items only after the server accepts them. This keeps ordering, guarantees no loss, prevents a long-offline sensor from overloading the server and limits retries to the remaining chunks.</p>
-<h2>Testing and CI</h2>
-<ul>
-<li><b>Fault injection.</b> A three-phase scenario with five sensors (normal operation, a disruption in which three go offline, then resynchronisation) passes when every disconnected sensor has emptied its buffer; a second scenario uses overlapping disconnections.</li>
-<li><b>Unit tests.</b> Mocked HTTP responses verify buffering on connection errors and 503s, buffer recovery on start, and order preservation during chunked resynchronisation.</li>
-<li><b>Load tests.</b> Against a live server: 5,000 readings in one request, 200 concurrent requests, and a sustained stream of 1,000 messages from 50 sensors, each requiring every request to be accepted.</li>
-</ul>
-<p>A three-stage GitLab CI pipeline runs style checks, builds and pushes the Docker image to the container registry, and runs the unit, load and fault tests inside that image against a RabbitMQ service.</p>
+<h3>Store-and-forward</h3>
+<p>Each sensor keeps its backlog as an in-memory queue mirrored to an append-only log file, so the buffer also survives a restart of the sensor and is reloaded on start. When a send fails, through a connection error, a timeout or a server error such as a 503, the sensor marks itself offline and appends the reading to its buffer. While offline, every new reading is buffered rather than sent.</p>
+<h3>Chunked resynchronisation</h3>
+<p>Once the connection is back, the sensor drains the backlog oldest first in chunks of 25 readings. On each cycle it sends one chunk, removes those items and rewrites the buffer file only after the server has accepted them, and then sends the current reading, so the backlog drains alongside live data rather than delaying it. A failed chunk leaves the buffer untouched and in order, the sensor returns to offline mode, and the new reading is appended to the end, so nothing is lost or reordered.</p>
+<p>Chunking keeps a sensor that has been offline for a long time from overloading the server, spreads the load when many sensors reconnect at once, and limits a failure partway through to retrying the remaining chunks rather than the whole backlog. Every reading carries its own UUID, assigned by the sensor when it is generated.</p>
+
+<h2>Evaluation</h2>
+<p>The evaluation tests the store-and-forward logic in isolation, the whole pipeline under failure, and the whole pipeline under load.</p>
+<h3>Fault injection</h3>
+<p>An automated scenario starts the server, consumer and five sensors and runs three phases: 10 seconds of normal operation as a baseline, a 20 second disruption in which three sensors go offline while the others keep sending, and 20 seconds of resynchronisation in which all three upload their backlogs at once. It passes when every disconnected sensor has emptied its buffer. A second scenario disconnects and reconnects two sensors at overlapping times.</p>
+<h3>Unit tests</h3>
+<p>Mocked HTTP responses test the sensor without a live server: the buffer is reloaded on start, connection errors and 503 responses both lead to buffering and offline mode, a successful chunk removes exactly the readings sent, and a failed chunk stays in the buffer with new readings appended after it.</p>
+<h3>Load tests</h3>
+<p>Run against the full architecture of server, broker and consumer, the load tests cover three scenarios: 5,000 readings in one request, as from a sensor resynchronising a large backlog; 200 concurrent requests, as from many sensors sending at once; and a sustained stream of 1,000 messages from 50 sensors, which checks that the consumer keeps pace with publishing so the queue does not grow without bound. Each passes only if every request is accepted.</p>
+
+<h2>Continuous integration</h2>
+<p>A three-stage GitLab CI pipeline runs a style stage (compilation check and black), a build stage that builds the Docker image and pushes it to the GitLab container registry, and a test stage that runs the unit, load and fault tests inside that image against a RabbitMQ service.</p>
+
 <h2>Scope</h2>
-<p>The sensors are simulated and the consumer only acknowledges messages. Next steps in the report are forwarding readings for analysis and storage, and device authentication.</p>
+<p>The sensors are simulated and the consumer only acknowledges messages. Next steps in the report are a consumer that forwards readings for analysis and storage, and device authentication at the ingestion service so that only authorised devices can send data.</p>
 
   </article>
   <aside class="p-side">

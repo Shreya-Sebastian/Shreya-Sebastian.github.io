@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=1c58edbb">
+<link rel="stylesheet" href="/assets/style.css?v=a9d416f8">
 </head>
 <body>
 <nav class="nav" aria-label="Main">
@@ -33,13 +33,15 @@
 <div class="container p-layout">
   <article class="prose">
 
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Tech Jobs Radar is a live job search site, built and run by me, that lists tech, software, data and IT vacancies in the Netherlands read directly from employers' own career sites.</li><li>Redis queue workers crawl applicant tracking system APIs and schema.org <code>JobPosting</code> pages, and a pipeline normalises, deduplicates, classifies and extracts each posting into a typed Pydantic schema stored in Postgres and served by FastAPI.</li><li>Extraction is gated in CI against a golden set of 46 postings (the build fails below 0.70 on the mean of nine field accuracies and skills F1), and the site's filters are scored on 200 held-out live postings with 95% confidence intervals.</li><li>Production runs on k3s on AWS EC2 within a 2 GB memory budget, deployed with Helm, Terraform, GitHub Actions and Flux in a GitOps workflow.</li></ul></div>
+
 <h2>Overview</h2>
-<p>Tech Jobs Radar is a live job search site for tech, software, data and IT vacancies in the Netherlands, collected directly from employers' own career sites. Each posting is classified and annotated with structured fields: required skills, seniority, experience, degree, posting language, whether Dutch is required, visa sponsorship and remote policy. Every listing links back to the employer's original page, and optional accounts keep a profile and saved jobs across devices.</p>
+<p>Tech Jobs Radar is a live job search site for tech, software, data and IT vacancies in the Netherlands, collected directly from employers' own career sites. Each posting is classified as tech or non-tech and annotated with structured fields: role family, skills, seniority, experience, degree, salary range, posting language, whether Dutch is required, visa sponsorship, remote policy and, for internships, whether university enrolment is required. Every listing links back to the employer's original page, and optional accounts keep a profile and saved jobs across devices.</p>
 
 <h2>Architecture</h2>
 <pre>sources -> queue -> workers + adapters -> normalise, filter, dedup -> classify, extract -> Postgres -> API -> site</pre>
 <ul>
-<li><b>Ingestion.</b> Source adapters for the public job board APIs of common applicant tracking systems (Greenhouse, Lever, Ashby, Workable, Recruitee, Teamtailor, Personio, Workday, SmartRecruiters and others), plus schema.org <code>JobPosting</code> data read through careers site sitemaps. New boards are discovered through the Internet Archive's URL index and the IND register of recognised sponsors.</li>
+<li><b>Ingestion.</b> Source adapters for the public job board APIs of common applicant tracking systems (Greenhouse, Lever, Ashby, Workable, Recruitee, Teamtailor, Personio, Workday, SmartRecruiters and others), plus schema.org <code>JobPosting</code> data read through careers site sitemaps.</li>
 <li><b>Crawling.</b> A Redis queue (RQ) with worker processes, one job per board, with per-host rate limits shared across all workers and robots.txt respected.</li>
 <li><b>Processing.</b> A Netherlands-only filter, duplicate linking, posting lifecycle tracking and periodic link checks, followed by a rule-based classifier and extractor that fill a typed schema.</li>
 <li><b>Serving.</b> A FastAPI JSON API with a response cache, and a plain JavaScript front end with Chart.js and D3.</li>
@@ -47,26 +49,39 @@
 <p>Every adapter maps a board's response to the same raw posting record, so the rest of the pipeline is independent of the source. The crawl steps are plain functions, so the same code runs in a queue worker, in a single local process and in the tests.</p>
 
 <h2>Data pipeline</h2>
+<h3>Source discovery</h3>
+<p>New boards are discovered through the Internet Archive's URL index and the IND register of recognised sponsors, with a weekly discovery run. Many large Dutch employers run their own career site rather than a public tracking board, but publish <code>JobPosting</code> structured data because Google for Jobs requires it. For these, discovery follows a domain's sitemaps to pages that look like job details and registers the sitemap only if sampled pages carry that data.</p>
+
 <h3>Crawl scheduling</h3>
-<p>Crawl frequency adapts to each source's recent yield of Dutch postings, and sources that repeatedly fail are disabled. Rate limits are counted per host in Redis, so all workers draw on one budget, and boards on a shared multi-tenant platform share one limit because such platforms rate-limit by IP. robots.txt is matched with longest-rule precedence, as major search engines do, rather than the first-match behaviour of Python's standard parser. Periodic jobs are queued from a scheduler thread inside the worker, which claims each time slot in Redis so that several workers never queue the same run twice.</p>
+<p> Crawl frequency adapts to each source's recent yield of Dutch postings, and sources that keep failing are disabled. Rate limits are counted per host in Redis, so all workers draw on one budget, and boards on a shared multi-tenant platform share one limit because such platforms rate-limit by IP. robots.txt is matched with longest-rule precedence, as major search engines apply it, rather than the first-match behaviour of Python's standard parser, which would read "disallow everything, allow /careers" as a ban on the careers pages.</p>
+<p>Periodic jobs are queued by a scheduler thread inside the worker rather than as Kubernetes CronJobs, which start a fresh process for every run and would strain the memory budget. They take priority over crawls and run one at a time in a forked child process that frees its memory on exit. Each time slot is claimed in Redis with an atomic set-if-absent, so several workers never queue the same run twice.</p>
 
-<h3>Lifecycle and deduplication</h3>
-<p>Each posting is normalised into canonical fields, including a duplicate key and a content hash; classification and extraction run only when the posting is new or its hash changes. Postings that disappear from a board are closed, with a guard that treats a sudden sharp drop in a board's postings as a partial response.</p>
-<p>Duplicates are linked to one canonical posting rather than deleted, by rules covering the same vacancy on several sources, reposts, per-city copies of one vacancy and Dutch and English versions of the same posting. The employer's own copy is preferred over an agency's. Dutch and English copies are paired one-to-one, using title similarity and shared numbers such as salary and hours, so that two Dutch jobs cannot collapse onto one English job.</p>
+<h3>Lifecycle</h3>
+<p>Each posting is normalised into canonical fields, including a city, a duplicate key from employer, title and city, and a content hash; classification and extraction run only when a posting is new or its hash changes, which keeps re-crawls cheap. Contact details are removed from posting text before storage. Postings that disappear from a board are closed, with two guards: if a board that had at least ten postings suddenly returns fewer than half as many, the response is treated as partial and nothing is closed, and an employer's expiry date is ignored for a source when more than 80% of its dated postings appear expired, since the field is then a template value.</p>
 
-<h3>Classification and extraction</h3>
-<p>The tech classifier scores job titles by rules, with an exclusion list for non-technical functions and phrases that keep a title technical despite an excluded word ("Sales Engineer"). Generic titles such as "Engineer" or "Analyst" count as tech only when the role text describes hands-on software, IT or data work.</p>
-<p>The extractor fills a typed Pydantic schema. It first segments a posting into the job description and the company description using Dutch and English section headers, and reads skills only from the job part, since company introductions often name the employer's own products. Requirements are parsed clause by clause, so that "Dutch is a plus" is not a Dutch requirement, office days in the same sentence turn "remote" into hybrid, and negation applies only within its clause. The rules are versioned, so stored postings can be re-extracted after a change. The rule-based extractor serves as a cheap, deterministic baseline that any LLM extractor would have to beat on the golden set.</p>
+<h3>Deduplication</h3>
+<p>Duplicates are linked to one canonical posting rather than deleted, by six rules: the same vacancy on several sources, reposts under a new URL, the same original URL, per-city copies recognised by identical text once city names and numbers are removed, the same page under another language segment of its URL, and Dutch and English versions of one vacancy. The employer's own copy is preferred over an agency's.</p>
+<p>Translated copies cannot be matched by key, because their titles differ. Within a source, a Dutch and an English posting are candidates when they share a day and city and either their titles are near-identical after removing language-specific prefixes or they share most of their numbers (salary, hours, reference numbers). Pairing is greedy and one-to-one on the combined score, so two Dutch jobs cannot collapse onto one English job.</p>
+
+<h3>Classification</h3>
+<p>The tech classifier scores job titles by rules, with an exclusion list for non-technical functions and phrases that keep a title technical despite an excluded word ("Sales Engineer"). Generic titles such as "Engineer" or "Analyst" count as tech only when the role text describes hands-on software, IT or data work. Titles are also mapped to position types by an ordered list in which the most specific pattern is tried first, so "Test Automation Engineer" is QA rather than software engineering.</p>
+
+<h3>Information extraction</h3>
+<p>The extractor fills a typed Pydantic schema. It first segments a posting into the job description and the company description using Dutch and English section headers, and reads skills only from the job part, since company introductions often name the employer's own products. Skills are matched against a taxonomy of canonical skills with alias patterns, which also disambiguates skill names that are common Dutch words. Posting language is decided from function words that occur in only one language.</p>
+<p>Requirements are parsed clause by clause, so that "Dutch is a plus" is not a Dutch requirement, office days in the same sentence turn "remote" into hybrid, and negation applies only within its clause. The rules are versioned, so stored postings can be re-extracted after a change. The rule-based extractor serves as a cheap, deterministic baseline that any LLM extractor would have to beat on the golden set.</p>
+
+<h3>Serving</h3>
+<p>API processes keep the live rows in memory. When the pipeline changes the data it increments a version key in Redis; each API process reloads on its next request, and heavy responses are cached under the current version, so a new version starts a fresh cache namespace without explicit invalidation.</p>
 
 <h2>Evaluation</h2>
-<p>The extractor is scored field by field against a hand-corrected golden set of 46 postings: exact match for scalar fields and precision, recall and F1 for skill lists. This evaluation runs in CI on every push as a quality gate, and the build fails if the mean of nine field accuracies and the skills F1 falls below 0.70.</p>
-<p>A second gate measures the site's filters on 500 live postings, split into 300 for tuning the rules and 200 held out for scoring only. Each filter is measured as it is used, with 95% confidence intervals; for the "English, no Dutch required" filter, for example, the share of shown jobs that need no Dutch. Since tech role classification is heavily imbalanced, with some rare categories, scores are tracked per field rather than as a single number.</p>
+<p>The extractor is scored field by field against a golden set of 46 postings, built by correcting the rule outputs: exact match for scalar fields, and set precision, recall and F1 for skill lists. This evaluation runs in CI on every push as a quality gate, and the build fails if the mean of nine field accuracies and the skills F1 falls below 0.70, so a rule change cannot silently degrade extraction.</p>
+<p>A second gate measures the site's filters on 500 live postings sampled across sources, languages and levels, split into 300 for tuning the rules and 200 held out for scoring only. Each filter is measured as it is used, with 95% confidence intervals, and for filters that hide or show postings the costly error is reported separately: for "English, no Dutch required", the share of shown jobs that need no Dutch. Since tech role classification is heavily imbalanced, with some rare categories, scores are tracked per field rather than as a single number.</p>
 
 <h2>Deployment</h2>
 <p>Production runs on k3s on a single AWS EC2 instance within a 2 GB memory budget, packaged as a Helm chart, with the AWS resources defined in Terraform. GitHub Actions runs the tests and evaluation gates on every push and builds an image tagged with the commit. Flux then deploys the release from Git in a GitOps workflow and rolls it back if the new pods do not become ready. Prometheus collects metrics, an alert fires when crawl volume drops, and the database is backed up to S3 nightly.</p>
 
 <h2>Data and terms</h2>
-<p>Only public job board APIs and careers pages are read. LinkedIn, Indeed and Glassdoor are excluded, as their terms prohibit automated access, as are aggregators and sites that block the crawler. Contact details are removed from posting text before storage.</p>
+<p>Only public job board APIs and careers pages are read. LinkedIn, Indeed and Glassdoor are excluded, as their terms prohibit automated access, as are aggregators and sites that block the crawler.</p>
 
   </article>
   <aside class="p-side">

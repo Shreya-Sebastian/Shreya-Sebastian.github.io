@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=1c58edbb">
+<link rel="stylesheet" href="/assets/style.css?v=a9d416f8">
 </head>
 <body>
 <nav class="nav" aria-label="Main">
@@ -33,29 +33,46 @@
 <div class="container p-layout">
   <article class="prose">
 
-<h2>The problem</h2>
-<p>Telling the pollen of Parietaria and Urtica, two genera of the nettle family (Urticaceae), apart under the microscope is hard because the grains look very similar. A microscope captures each grain as a Z-stack: a series of images at different focal depths. Earlier work classified these grains from 2D projections of the stack, which compress the depth information into a single image.</p>
-<p>This thesis asks whether a network that sees the whole stack in 3D does better. It was my BSc thesis in Computer Science at Leiden University.</p>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>My BSc thesis at Leiden University classifies microscope Z-stacks of nettle-family pollen into three classes (Parietaria, Urtica dioica/urens and Urtica membranacea) using every focal plane of the stack.</li><li>The stacks are standardised to 20 frames of 224 × 224 pixels and classified with 3D convolutional networks in PyTorch: a small baseline 3D CNN and a ResNet3D (r3d_18) trained with cross-entropy and AdamW.</li><li>On about 600 stacks, a ResNet3D trained on the whole stack reached 95 percent test accuracy and a weighted F1 of 0.949, ahead of the baseline and of models trained on subsections of the stack.</li><li>Experiments on learning rate, augmentation, batch size, stack depth and transfer learning from video showed that the outer focal planes carry useful information and that video pretraining did not help.</li></ul></div>
 
-<h2>Approach</h2>
-<p>A 3D convolutional network uses kernels that also span the depth of the input, as in models for volumetric images and video. Applied to a Z-stack, it can draw on all of the focal planes rather than a single flattened view.</p>
+<h2>Overview</h2>
+<p>Telling the pollen of Parietaria and Urtica, two genera of the nettle family (Urticaceae), apart under the microscope is hard because the grains look very similar. A microscope captures each grain as a Z-stack: a series of images at different focal depths, each with a different part of the grain in focus. Earlier work classified these grains from 2D projections of the stack, which compress the depth information into a single image.</p>
+<p>This thesis asks how well a network that sees the whole stack in 3D can classify the grains, and which parts of the stack it needs. It was my BSc thesis in Computer Science at Leiden University.</p>
 
-<h2>Data and preprocessing</h2>
+<h2>Data</h2>
+<p>The dataset holds about 600 Z-stacks, 200 per class, in three classes: Parietaria (P. judaica and P. officinalis), Urtica dioica/urens and Urtica membranacea. The stacks vary in both image size and number of frames.</p>
+<pre>Z-stack (variable size and depth)
+  -> zero-pad or crop each frame to 224 x 224
+  -> keep the middle 20 frames
+  -> rescale to [-1, 1]
+  -> training only: add augmented copies (flips, rotation)
+  -> 3D CNN -> softmax over 3 classes</pre>
+<p>10 percent of the stacks are held out for testing and 10 percent of the remainder for validation, so the test set is never seen during training or model selection.</p>
+
+<h2>Method</h2>
+<h3>Why 3D convolutions</h3>
+<p>A standard convolutional network slides 2D kernels over a single image. A 3D convolutional network uses kernels that also span the depth of the input, which is why such networks are used for volumetric images and video. Applied to a Z-stack, it can learn features that combine neighbouring focal planes, such as how a structure comes into and out of focus, rather than working from a single flattened view.</p>
+
+<h3>Preprocessing</h3>
+<p>Each frame is zero-padded or cropped to 224 × 224 pixels. The stack is then trimmed to its middle 20 frames, keeping the central part of the focal series, and pixel values are rescaled from [0, 1] to [−1, 1] to centre the inputs around zero. This gives every sample the same volumetric shape, which batched 3D convolution requires.</p>
+
+<h3>Augmentation</h3>
+<p>Augmentation adds copies rather than replacing originals. Each training stack is selected for an augmented copy with a probability set by an augmentation threshold, and a selected stack is randomly flipped horizontally and vertically and rotated by up to 100 degrees. Flips and rotations change the orientation of a grain but not its class, so they produce new samples without new labels. Keeping the originals means the model sees each grain at least once in its recorded orientation, and the threshold makes the amount of extra data a tunable hyperparameter.</p>
+
+<h3>Models</h3>
 <ul>
-<li>About 600 Z-stacks of variable size, in three classes: Parietaria, Urtica dioica/urens and Urtica membranacea.</li>
-<li>Each stack is zero-padded or cropped to 224 × 224 pixels, trimmed to its middle 20 frames and rescaled to [−1, 1], giving every input the same volumetric shape.</li>
-<li>10 percent of the data is held out for testing and 10 percent of the remainder for validation.</li>
-<li>Training stacks are augmented with random flips and rotations, with a threshold controlling the share of stacks that gain an augmented copy.</li>
+<li><b>Baseline 3D CNN.</b> Two 3D convolution layers with 32 and 64 filters of size 3 × 3 × 3 and ReLU activations, with max pooling after the first, followed by dropout (rate 0.2), a fully connected hidden layer of 128 units and a three-class output. It serves as a simple reference point for what a shallow 3D network can learn from this data.</li>
+<li><b>ResNet3D.</b> torchvision's r3d_18, an 18-layer residual network for video clips. Its stem convolution was replaced with one that accepts the 20-frame stack, and a final linear layer maps its 400 outputs to the three classes. The residual connections let the deeper network train stably, and for the main experiments it was trained from randomly initialised weights.</li>
 </ul>
 
-<h2>Models</h2>
-<ul>
-<li><b>Baseline 3D CNN.</b> Two 3D convolution layers with max pooling and dropout, followed by fully connected layers, as a reference point.</li>
-<li><b>ResNet3D.</b> torchvision's r3d_18, an 18-layer residual network for video, with its first convolution adapted to the 20-frame stack and a linear layer mapping to the three classes. It was trained from randomly initialised weights.</li>
-</ul>
-<p>Both were trained in PyTorch with cross-entropy loss and AdamW on Google Colab, with checkpoint selection on validation accuracy, and evaluated on accuracy and weighted F1, which weights per-class F1 by class size. ResNet3D outperformed the baseline and was used for hyperparameter tuning and the remaining experiments.</p>
+<h3>Training and evaluation</h3>
+<p>Both models were trained in PyTorch on Google Colab with cross-entropy loss and AdamW, whose decoupled weight decay acts as a regulariser. After every epoch the model was evaluated on the training and validation sets, and the checkpoint with the highest validation accuracy was kept for testing. The final configuration used a batch size of 16, a weight decay of 0.01 and 30 epochs.</p>
+<p>Models were compared on accuracy and on weighted F1, which averages the per-class F1 scores in proportion to class size. F1 combines precision and recall, so it reflects whether the model separates all three classes rather than favouring one of them. Learning curves of loss, F1 and accuracy on the training and validation sets were used to diagnose overfitting.</p>
 
 <h2>Results</h2>
+<h3>Baseline against ResNet3D</h3>
+<p>ResNet3D outperformed the baseline 3D CNN and was used for hyperparameter tuning and all remaining experiments.</p>
+
 <h3>Tuning</h3>
 <div class="table-wrap"><table>
 <tr><th>ResNet3D, learning rate</th><th>Test loss</th><th>Weighted F1</th><th>Accuracy</th></tr>
@@ -64,18 +81,26 @@
 <tr><td>1e-6</td><td>0.444</td><td>0.788</td><td>0.800</td></tr>
 </table></div>
 <figure><img src="/img/bsc_learning_curves.jpg" alt="Train and validation loss, F1-score and accuracy curves for ResNet3D at learning rate 1e-4" loading="lazy"><figcaption>Learning curves for ResNet3D at learning rate 1e-4.</figcaption></figure>
+<p>Of the three learning rates, 1e-4 gave the lowest test loss and the highest weighted F1 and accuracy.</p>
 <ul>
-<li><b>Augmentation.</b> Augmenting half of the training set gave the best test accuracy in a tuning sweep over thresholds of 0, 0.25, 0.5 and 0.75.</li>
-<li><b>Batch size.</b> A batch size of 16 gave better test metrics than 32. The final configuration used a weight decay of 0.01 and 30 epochs.</li>
-</ul>
-<h3>Experiments</h3>
-<ul>
-<li><b>Whole stack against subsections.</b> Training on the full 20-frame stack gave better and more stable results than subsections of middle frames, which indicates that the outer focal planes carry useful information.</li>
-<li><b>Transfer learning.</b> Initialising from weights pretrained on video did not improve test accuracy.</li>
+<li><b>Augmentation.</b> In a short three-epoch sweep over thresholds of 0, 0.25, 0.5 and 0.75, augmenting half of the training set gave the best test accuracy (0.79, against 0.70 to 0.71 for the other settings).</li>
+<li><b>Batch size.</b> A batch size of 16 gave better test metrics than 32.</li>
 </ul>
 
+<h3>Whole stack against subsections</h3>
+<p>To test which focal planes the classifier needs, ResNet3D was also trained on subsections made of the middle frames only. The full 20-frame stack gave the best and most stable results, which indicates that the outer focal planes carry information that the central planes alone do not.</p>
+
+<h3>Transfer learning</h3>
+<p>Initialising ResNet3D from weights pretrained on video was tested as a way to compensate for the small dataset. It did not improve test accuracy, so the final model was trained from scratch.</p>
+
 <h2>Conclusion</h2>
-<p>A ResNet3D trained on the whole stack reached 95 percent test accuracy. Larger datasets and k-fold cross-validation are natural next steps.</p>
+<p>A ResNet3D trained from scratch on the whole stack reached 95 percent test accuracy and a weighted F1 of 0.949 across the three classes, and using every focal plane gave better and more stable results than using only the central ones.</p>
+
+<h2>Limitations</h2>
+<ul>
+<li>The scores come from a single train and test split; k-fold cross-validation would give a more reliable estimate.</li>
+<li>3D networks are large relative to a dataset of this size; a larger dataset is the natural next step.</li>
+</ul>
 <p>The project builds on <a href="https://doi.org/10.1016/j.neucom.2022.11.042">Analysis of automatic image classification methods for Urticaceae pollen classification</a> (Li et al., 2023).</p>
 
   </article>
