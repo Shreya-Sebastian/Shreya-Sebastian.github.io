@@ -1,3 +1,18 @@
+// Dark mode toggle; the initial theme is set by an inline script in <head>
+(function () {
+  var btn = document.querySelector('.theme-toggle'); if (!btn) return;
+  var root = document.documentElement;
+  btn.addEventListener('click', function () {
+    var t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', t);
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+    var saved; try { saved = localStorage.getItem('theme'); } catch (err) {}
+    if (!saved) root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+  });
+})();
+
 // Copy email buttons
 document.querySelectorAll('[data-copy]').forEach(function (btn) {
   btn.addEventListener('click', function () {
