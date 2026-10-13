@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A proof of concept for loss-free sensor data ingestion in a smart home architecture, built for the TU Delft Software Architecture course, where I built most of the proof of concept and wrote the report sections on it.</li><li>Sensors use store-and-forward with a persistent local buffer and chunked resynchronisation, sending readings over HTTP to a FastAPI service that validates them with Pydantic and publishes them to a durable RabbitMQ queue read by acknowledging consumers.</li><li>Fault-injection scenarios, unit tests with mocked HTTP failures and load tests (5,000 readings in one request, 200 concurrent requests, 1,000 messages from 50 sensors) confirm that every disconnected sensor empties its buffer and every request is accepted.</li><li>A three-stage GitLab CI pipeline runs style checks, builds the Docker image and runs all tests inside it against a RabbitMQ service.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A proof of concept for loss-free sensor data ingestion in a smart home architecture, built for the TU Delft Software Architecture course, where <strong>I built most of the proof of concept</strong> and wrote the report sections on it.</li><li>Sensors use store-and-forward with a persistent local buffer and chunked resynchronisation, sending readings over HTTP to a <strong>FastAPI service</strong> that validates them with Pydantic and publishes them to a <strong>durable RabbitMQ queue</strong> read by acknowledging consumers.</li><li>Fault-injection scenarios, unit tests with mocked HTTP failures and <strong>load tests</strong> (5,000 readings in one request, 200 concurrent requests, 1,000 messages from 50 sensors) confirm that every disconnected sensor empties its buffer and every request is accepted.</li><li>A three-stage <strong>GitLab CI pipeline</strong> runs style checks, builds the Docker image and runs all tests inside it against a RabbitMQ service.</li></ul></div>
 
 <h2>Context</h2>
 <p>For the Software Architecture course our team designed a smart home system that learns household routines from sensor data. To keep sensitive data under the user's control while still allowing remote access, the design splits the system into a local hub, which handles data collection, storage, routine learning and device communication, and a set of cloud services for remote access, authentication, updates and notifications. The hub follows a microkernel architecture, with a core and independent plug-ins, and the cloud side a microservice architecture. I built most of the proof of concept and wrote the report sections on it.</p>

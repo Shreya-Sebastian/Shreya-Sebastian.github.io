@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>RetroSTC-Net implements synaptic tagging and capture in backprop-trained networks, so that a salient event after learning decides which weight changes become permanent.</li><li>Each weight is split into a consolidated and a labile component, with decaying per-weight tags and shared plasticity-related products, and every consolidated change is logged with the task and event that produced it.</li><li>On binary MNIST tasks an event at the end of learning keeps 91% of a task's learning and holds accuracy at about 0.95 instead of 0.61, and the onset of a later task can rescue an earlier one retroactively.</li><li>In a deletion test the consolidation log separates two memories more clearly than Fisher importance, and used as importance on Split-MNIST it reaches EWC level (0.636 against 0.637).</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>RetroSTC-Net implements synaptic tagging and capture in backprop-trained networks, so that a salient event after learning decides which weight changes become permanent.</li><li>Each weight is split into a consolidated and a labile component, with decaying per-weight tags and shared plasticity-related products, and every consolidated change is logged with the task and event that produced it.</li><li>On binary MNIST tasks an event at the end of learning <strong>keeps 91% of a task's learning</strong> and holds accuracy at <strong>about 0.95 instead of 0.61</strong>, and the onset of a later task can rescue an earlier one retroactively.</li><li>In a deletion test the consolidation log separates two memories more clearly than Fisher importance, and used as importance on Split-MNIST it <strong>reaches EWC level</strong> (0.636 against 0.637).</li></ul></div>
 
 <h2>Overview</h2>
 <p>The synaptic tagging and capture (STC) hypothesis (Frey and Morris, 1997) holds that learning leaves a short-lived change and a temporary tag, and the change becomes permanent only if plasticity-related products, which a separate salient event can trigger, arrive while the tag is present. Behaviourally, an unfamiliar experience shortly before or after weak learning makes the weak memory last.</p>

@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A reimplementation in PyTorch of MFEF (Zhou et al., 2023), a multi-view convolutional network for underwater image enhancement, built from the paper's description because no public code was available.</li><li>The network fuses the raw image with white-balanced and CLAHE views through residual enhancement modules, multi-kernel fusion and pixel-weighted channel attention at three scales, followed by coarse-to-fine reconstruction.</li><li>Trained on the 890 image pairs of the UIEB benchmark with an L1 plus VGG-16 perceptual loss, it produced outputs visually close to the references and was evaluated with five full-reference and no-reference quality metrics.</li><li>In a team of four for the TU Delft Deep Learning course, I built the model architecture, contributed to preprocessing and wrote the blog post.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A <strong>reimplementation in PyTorch</strong> of MFEF (Zhou et al., 2023), a multi-view convolutional network for underwater image enhancement, built from the paper's description because <strong>no public code was available</strong>.</li><li>The network fuses the raw image with white-balanced and CLAHE views through residual enhancement modules, multi-kernel fusion and pixel-weighted channel attention at three scales, followed by coarse-to-fine reconstruction.</li><li>Trained on the 890 image pairs of the UIEB benchmark with an L1 plus VGG-16 perceptual loss, it produced outputs visually close to the references and was evaluated with five full-reference and no-reference quality metrics.</li><li>In a team of four for the TU Delft Deep Learning course, <strong>I built the model architecture</strong>, contributed to preprocessing and wrote the blog post.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Underwater photos lose colour and contrast because water absorbs and scatters light. Absorption varies with wavelength and often suppresses the red channel, leaving a blue or green cast, and scattering adds blur.</p>
