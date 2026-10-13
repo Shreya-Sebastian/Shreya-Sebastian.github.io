@@ -13,19 +13,23 @@
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <title>3D CNNs for pollen classification | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/bsc-thesis/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/bsc-thesis/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=c95ae024">
+<link rel="stylesheet" href="/assets/style.css?v=b7d31e02">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main">
   <div class="container">
     <a class="logo" href="/">Shreya Sebastian</a>
     <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
-<main>
+<main id="main">
 
 <header class="p-hero">
   <div class="container">
@@ -34,7 +38,7 @@
     <h1>3D CNNs for pollen classification</h1>
     <p class="summary">Enhancing pollen classification accuracy through the use of whole stack images in 3D convolutional neural networks.</p>
     
-    <figure class="p-figure fig"><img src="/img/bsc_pollen_focal_planes.jpg" alt="Microscope Z-stacks of one pollen grain from each class, Parietaria, Urtica dioica/urens and Urtica membranacea, at five focal planes"></figure>
+    <figure class="p-figure fig"><img src="/img/bsc_pollen_focal_planes.jpg" width="1934" height="1022" alt="Microscope Z-stacks of one pollen grain from each class, Parietaria, Urtica dioica/urens and Urtica membranacea, at five focal planes"></figure>
     
   </div>
 </header>
@@ -88,7 +92,7 @@
 <tr><td>1e-5</td><td>0.363</td><td>0.859</td><td>0.867</td></tr>
 <tr><td>1e-6</td><td>0.444</td><td>0.788</td><td>0.800</td></tr>
 </table></div>
-<figure><img src="/img/bsc_learning_curves.jpg" alt="Train and validation loss, F1-score and accuracy curves for ResNet3D at learning rate 1e-4" loading="lazy"><figcaption>Learning curves for ResNet3D at learning rate 1e-4.</figcaption></figure>
+<figure><img src="/img/bsc_learning_curves.jpg" width="1400" height="699" alt="Train and validation loss, F1-score and accuracy curves for ResNet3D at learning rate 1e-4" loading="lazy"><figcaption>Learning curves for ResNet3D at learning rate 1e-4.</figcaption></figure>
 <p>Of the three learning rates, 1e-4 gave the lowest test loss and the highest weighted F1 and accuracy.</p>
 <ul>
 <li><b>Augmentation.</b> In a short three-epoch sweep over thresholds of 0, 0.25, 0.5 and 0.75, augmenting half of the training set gave the best test accuracy (0.79, against 0.70 to 0.71 for the other settings).</li>
