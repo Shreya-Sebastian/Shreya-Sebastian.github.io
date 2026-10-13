@@ -13,19 +13,23 @@
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <title>Tech Jobs Radar | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/tech-jobs-radar/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/tech-jobs-radar/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=c95ae024">
+<link rel="stylesheet" href="/assets/style.css?v=b7d31e02">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main">
   <div class="container">
     <a class="logo" href="/">Shreya Sebastian</a>
     <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
-<main>
+<main id="main">
 
 <header class="p-hero">
   <div class="container">
@@ -34,7 +38,7 @@
     <h1>Tech Jobs Radar</h1>
     <p class="summary">A job board for tech vacancies in the Netherlands, read directly from employers&#x27; own career sites, with every posting classified and tagged.</p>
     
-    <figure class="p-figure"><img src="/img/techjobsradar.png" alt="Tech Jobs Radar overview page with skill demand charts"></figure>
+    <figure class="p-figure"><img src="/img/techjobsradar.png" width="2400" height="1350" alt="Tech Jobs Radar overview page with skill demand charts"></figure>
     
   </div>
 </header>
@@ -61,7 +65,7 @@
 <p>New boards are discovered through the Internet Archive's URL index and the IND register of recognised sponsors, with a weekly discovery run. Many large Dutch employers run their own career site rather than a public tracking board, but publish <code>JobPosting</code> structured data because Google for Jobs requires it. For these, discovery follows a domain's sitemaps to pages that look like job details and registers the sitemap only if sampled pages carry that data.</p>
 
 <h3>Crawl scheduling</h3>
-<p> Crawl frequency adapts to each source's recent yield of Dutch postings, and sources that keep failing are disabled. Rate limits are counted per host in Redis, so all workers draw on one budget, and boards on a shared multi-tenant platform share one limit because such platforms rate-limit by IP. robots.txt is matched with longest-rule precedence, as major search engines apply it, rather than the first-match behaviour of Python's standard parser, which would read "disallow everything, allow /careers" as a ban on the careers pages.</p>
+<p>Crawl frequency adapts to each source's recent yield of Dutch postings, and sources that keep failing are disabled. Rate limits are counted per host in Redis, so all workers draw on one budget, and boards on a shared multi-tenant platform share one limit because such platforms rate-limit by IP. robots.txt is matched with longest-rule precedence, as major search engines apply it, rather than the first-match behaviour of Python's standard parser, which would read "disallow everything, allow /careers" as a ban on the careers pages.</p>
 <p>Periodic jobs are queued by a scheduler thread inside the worker rather than as Kubernetes CronJobs, which start a fresh process for every run and would strain the memory budget. They take priority over crawls and run one at a time in a forked child process that frees its memory on exit. Each time slot is claimed in Redis with an atomic set-if-absent, so several workers never queue the same run twice.</p>
 
 <h3>Lifecycle</h3>

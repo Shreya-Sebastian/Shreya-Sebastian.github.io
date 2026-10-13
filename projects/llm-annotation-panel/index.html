@@ -13,19 +13,23 @@
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <title>LLM annotation panel | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/llm-annotation-panel/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/llm-annotation-panel/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=c95ae024">
+<link rel="stylesheet" href="/assets/style.css?v=b7d31e02">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main">
   <div class="container">
     <a class="logo" href="/">Shreya Sebastian</a>
     <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
-<main>
+<main id="main">
 
 <header class="p-hero">
   <div class="container">
@@ -87,7 +91,7 @@
 <p>Scores are averaged per iteration over the five runs, and only iterations with a score in both conditions are compared, which gives 39 paired observations. Normality of the per-iteration scores is checked with Shapiro-Wilk before applying a paired t-test to the two conditions. Kendall's tau between iteration number and F1, computed separately for each condition, tests whether agreement drifts as the panel accumulates feedback. As a rank correlation, it detects any monotonic trend without assuming that the change is linear.</p>
 
 <h2>Results</h2>
-<figure><img src="/img/llm_panel_f1.png" alt="Line chart of pairwise F1 per iteration for the baseline and feedback conditions" loading="lazy"><figcaption>Agreement between the models (pairwise F1) per iteration, averaged over the five runs.</figcaption></figure>
+<figure><img src="/img/llm_panel_f1.png" width="1200" height="600" alt="Line chart of pairwise F1 per iteration for the baseline and feedback conditions" loading="lazy"><figcaption>Agreement between the models (pairwise F1) per iteration, averaged over the five runs.</figcaption></figure>
 <div class="table-wrap"><table>
 <tr><th></th><th>Baseline</th><th>Feedback</th></tr>
 <tr><td>Mean pairwise F1</td><td>0.185</td><td>0.216</td></tr>

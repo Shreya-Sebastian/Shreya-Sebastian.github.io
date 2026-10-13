@@ -13,19 +13,23 @@
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <title>Earthquake visualiser | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/earthquake-map/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/earthquake-map/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=c95ae024">
+<link rel="stylesheet" href="/assets/style.css?v=b7d31e02">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main">
   <div class="container">
     <a class="logo" href="/">Shreya Sebastian</a>
     <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
-<main>
+<main id="main">
 
 <header class="p-hero">
   <div class="container">
@@ -34,7 +38,7 @@
     <h1>Earthquake visualiser</h1>
     <p class="summary">An interactive web visualisation of significant earthquakes and tsunamis, in which a map, a timeline, a scatterplot and a detail panel filter each other.</p>
     <div class="callout"><p><b>Try it live.</b> <a href="https://shreya-sebastian.github.io/Earthquakes/">Open the earthquake visualiser ↗</a></p></div>
-    <figure class="p-figure"><img src="/img/eq_overview.jpg" alt="The earthquake visualiser: timeline, world map, scatterplot and detail panels"></figure>
+    <figure class="p-figure"><img src="/img/eq_overview.jpg" width="1600" height="1000" alt="The earthquake visualiser: timeline, world map, scatterplot and detail panels"></figure>
     
   </div>
 </header>
@@ -61,7 +65,7 @@
 <p>The receiving behaviours differ by view. The map filters to the selection. The scatterplot keeps the full distribution in the background, since a selected point is read relative to all others. The timeline re-bins, since a selection often covers a much shorter span than the full record. Two global controls act on all four views at once: a reset, and a tsunami-only filter that restricts every view to earthquakes that caused a tsunami.</p>
 
 <div class="view">
-<figure><img src="/img/eq_timeline.jpg" alt="Timeline grid of year ranges against months, with a selected block of cells highlighted in orange" loading="lazy"></figure>
+<figure><img src="/img/eq_timeline.jpg" width="948" height="1274" alt="Timeline grid of year ranges against months, with a selected block of cells highlighted in orange" loading="lazy"></figure>
 <div>
 <p class="eyebrow">View 1 · my part</p>
 <h3>Timeline</h3>
@@ -76,7 +80,7 @@
 </div>
 
 <div class="view">
-<figure><img src="/img/eq_map.jpg" alt="World map with tectonic plate boundaries, showing only the earthquakes selected in the timeline" loading="lazy"></figure>
+<figure><img src="/img/eq_map.jpg" width="948" height="1274" alt="World map with tectonic plate boundaries, showing only the earthquakes selected in the timeline" loading="lazy"></figure>
 <div>
 <p class="eyebrow">View 2</p>
 <h3>World map</h3>
@@ -90,7 +94,7 @@
 </div>
 
 <div class="view">
-<figure><img src="/img/eq_scatter.jpg" alt="Scatterplot of magnitude against focal depth for all earthquakes" loading="lazy"></figure>
+<figure><img src="/img/eq_scatter.jpg" width="948" height="1274" alt="Scatterplot of magnitude against focal depth for all earthquakes" loading="lazy"></figure>
 <div>
 <p class="eyebrow">View 3</p>
 <h3>Scatterplot</h3>
@@ -110,7 +114,7 @@
 <p>Selections use direct manipulation in every view: click for a single event and drag a box for a set, with box selection on Ctrl-drag in the map and scatterplot, so that a plain drag still pans the map. Each selection is applied immediately to the other views, without a separate apply step, so cause and effect stay visible. Feedback is explicit where a selection could otherwise look like a failure, such as an empty timeframe or a selection without values on the current scatterplot axes.</p>
 
 <h3>Points of interest and details</h3>
-<figure><img src="/img/eq_details.jpg" alt="Points of interest buttons, the colour and size legend, and the detail panel for a selected earthquake" loading="lazy"><figcaption>Preset points of interest, the legend, and the full record of a selected earthquake.</figcaption></figure>
+<figure><img src="/img/eq_details.jpg" width="1600" height="400" alt="Points of interest buttons, the colour and size legend, and the detail panel for a selected earthquake" loading="lazy"><figcaption>Preset points of interest, the legend, and the full record of a selected earthquake.</figcaption></figure>
 <p>Three preset points of interest guide the user to notable patterns: earthquakes with many people missing, with many houses destroyed, and low-magnitude earthquakes with high damage. Each selects one event across all four views, sets matching scatterplot axes, for example magnitude against damage for the low-magnitude case, and links to official information. The detail panel shows the full record of a selected earthquake: date and time fields are combined into one timestamp, a missing impact figure is replaced by its recorded category where there is one, and the tsunami identifier is used to join the related tsunami records into a second section.</p>
 
 <h2>Deployment</h2>

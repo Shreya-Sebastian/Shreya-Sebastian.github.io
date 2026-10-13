@@ -13,19 +13,23 @@
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <title>Deep learning paper reproduction | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/deep-learning-reproduction/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/deep-learning-reproduction/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=c95ae024">
+<link rel="stylesheet" href="/assets/style.css?v=b7d31e02">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main">
   <div class="container">
     <a class="logo" href="/">Shreya Sebastian</a>
     <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
-<main>
+<main id="main">
 
 <header class="p-hero">
   <div class="container">
@@ -48,7 +52,7 @@
 <p>The paper we reproduced (Zhou et al., 2023) enhances underwater images with MFEF, a multi-view fusion network. Rather than learning from a single input, it gives the network several versions of the same image, each of which exposes a different kind of information, and lets it learn how to combine them. With no public code available, we reimplemented the method in PyTorch from the paper's description and trained it on the UIEB benchmark. This was a team of four for the TU Delft Deep Learning course; I built the model architecture with a teammate, contributed to preprocessing and wrote the blog post.</p>
 
 <h2>Data and inputs</h2>
-<figure><img src="/img/dl_repro_views.jpg" alt="Grid of underwater images: raw, white-balanced, contrast-enhanced and reference versions" loading="lazy"><figcaption>From top to bottom: raw images, the white-balanced view, the contrast-enhanced (CLAHE) view and the reference images.</figcaption></figure>
+<figure><img src="/img/dl_repro_views.jpg" width="950" height="1043" alt="Grid of underwater images: raw, white-balanced, contrast-enhanced and reference versions" loading="lazy"><figcaption>From top to bottom: raw images, the white-balanced view, the contrast-enhanced (CLAHE) view and the reference images.</figcaption></figure>
 <p>UIEB (Underwater Image Enhancement Benchmark) pairs 890 raw underwater images with reference images. All images are resized to 256 × 256 to give a fixed input size, and the pairs are split 85/15 into training and test sets.</p>
 <p>Each raw image is turned into three views that enter the network as separate branches:</p>
 <ul>
@@ -102,7 +106,7 @@
 <p>Each metric was computed per test image, and the distributions were examined as well as the means.</p>
 
 <h2>Results</h2>
-<figure><img src="/img/dl_repro_output.png" alt="Diver image: raw input, reference and model output" loading="lazy"><figcaption>Raw input, reference and our model's output.</figcaption></figure>
+<figure><img src="/img/dl_repro_output.png" width="794" height="247" alt="Diver image: raw input, reference and model output" loading="lazy"><figcaption>Raw input, reference and our model's output.</figcaption></figure>
 <p>The enhanced images come out visually close to the references. SSIM was concentrated in a narrow range, indicating that structure is preserved consistently across images, while PSNR varied more between images, with most of its mass at the higher values. PSNR and SSIM were lower than reported in the paper, and the other three metrics did not line up with the paper's values.</p>
 
 <h2>Limitations</h2>

@@ -13,19 +13,23 @@
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <title>Fault-tolerant sensor ingestion | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/sensor-ingestion/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/sensor-ingestion/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=c95ae024">
+<link rel="stylesheet" href="/assets/style.css?v=b7d31e02">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main">
   <div class="container">
     <a class="logo" href="/">Shreya Sebastian</a>
     <ul><li><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li></ul>
   </div>
 </nav>
-<main>
+<main id="main">
 
 <header class="p-hero">
   <div class="container">
@@ -53,7 +57,7 @@
 <p>Availability is defined as sensors continuing to produce readings while disconnected, with every reading reaching the queue once the connection returns.</p>
 
 <h2>Architecture</h2>
-<figure><img src="/img/sensor_poc_architecture.png" alt="Sensors with local buffers send HTTP requests to an ingestion server, which publishes to a message queue read by a consumer" loading="lazy"><figcaption>Sensors send readings over HTTP to the ingestion server, which publishes them to a queue; each sensor keeps a local buffer for when the connection is down.</figcaption></figure>
+<figure><img src="/img/sensor_poc_architecture.png" width="1699" height="1390" alt="Sensors with local buffers send HTTP requests to an ingestion server, which publishes to a message queue read by a consumer" loading="lazy"><figcaption>Sensors send readings over HTTP to the ingestion server, which publishes them to a queue; each sensor keeps a local buffer for when the connection is down.</figcaption></figure>
 <pre>sensor (buffer) -> HTTP batch -> ingestion service (validate) -> durable queue -> consumer (ack)</pre>
 <ul>
 <li><b>Ingestion service.</b> A stateless FastAPI REST endpoint that accepts a batch of readings, validates each against a Pydantic schema (reading identifier, sensor identifier, type, value and timestamp) and publishes it to RabbitMQ as a persistent message. It returns 503 when the broker is unreachable, so the sensor treats a broker outage like a network outage, and exposes a health endpoint.</li>
