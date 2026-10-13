@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Tech Jobs Radar is a live job search site, built and run by me, that lists tech, software, data and IT vacancies in the Netherlands read directly from employers' own career sites.</li><li>Redis queue workers crawl applicant tracking system APIs and schema.org <code>JobPosting</code> pages, and a pipeline normalises, deduplicates, classifies and extracts each posting into a typed Pydantic schema stored in Postgres and served by FastAPI.</li><li>Extraction is gated in CI against a golden set of 46 postings (the build fails below 0.70 on the mean of nine field accuracies and skills F1), and the site's filters are scored on 200 held-out live postings with 95% confidence intervals.</li><li>Production runs on k3s on AWS EC2 within a 2 GB memory budget, deployed with Helm, Terraform, GitHub Actions and Flux in a GitOps workflow.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Tech Jobs Radar is a live job search site, <strong>built and run by me</strong>, that lists tech, software, data and IT vacancies in the Netherlands read directly from employers' own career sites.</li><li>Redis queue workers crawl applicant tracking system APIs and schema.org <code>JobPosting</code> pages, and a pipeline normalises, deduplicates, classifies and extracts each posting into a <strong>typed Pydantic schema stored in Postgres and served by FastAPI</strong>.</li><li>Extraction is <strong>gated in CI against a golden set of 46 postings</strong> (the build fails below 0.70 on the mean of nine field accuracies and skills F1), and the site's filters are scored on 200 held-out live postings with 95% confidence intervals.</li><li>Production runs on <strong>k3s on AWS EC2 within a 2 GB memory budget</strong>, deployed with <strong>Helm, Terraform, GitHub Actions and Flux</strong> in a GitOps workflow.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Tech Jobs Radar is a live job search site for tech, software, data and IT vacancies in the Netherlands, collected directly from employers' own career sites. Each posting is classified as tech or non-tech and annotated with structured fields: role family, skills, seniority, experience, degree, salary range, posting language, whether Dutch is required, visa sponsorship, remote policy and, for internships, whether university enrolment is required. Every listing links back to the employer's original page, and optional accounts keep a profile and saved jobs across devices.</p>

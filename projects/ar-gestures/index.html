@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -51,7 +51,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A browser-based augmented reality demo, built by me, that recognises five hand gestures from the webcam and renders a matching particle effect that follows the hand.</li><li>MediaPipe Hands provides 21 hand landmarks per frame, geometric rules classify the gesture, and a five-frame majority vote with a 300 ms hold suppresses flicker.</li><li>Each effect is a separate particle system on a Canvas 2D overlay (emission with damping, orbital motion, recursive midpoint displacement, gravity, procedural snowflakes), anchored to the palm and scaled by hand size so it stays consistent at any distance from the camera.</li><li>It runs in real time in plain JavaScript with no build step, using a frame-rate independent update with a capped time step.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A browser-based augmented reality demo, <strong>built by me</strong>, that recognises five hand gestures from the webcam and renders a matching particle effect that follows the hand.</li><li><strong>MediaPipe Hands</strong> provides 21 hand landmarks per frame, geometric rules classify the gesture, and a five-frame majority vote with a 300 ms hold suppresses flicker.</li><li>Each effect is a separate particle system on a Canvas 2D overlay (emission with damping, orbital motion, recursive midpoint displacement, gravity, procedural snowflakes), anchored to the palm and scaled by hand size so it stays consistent at any distance from the camera.</li><li>It runs in <strong>real time in plain JavaScript</strong> with no build step, using a frame-rate independent update with a capped time step.</li></ul></div>
 
 <h2>Overview</h2>
 <p>A browser-based augmented reality demo driven by the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time, a rule-based recogniser classifies the gesture from their geometry, and a particle effect is rendered on a canvas overlay that follows the hand. It is written in plain JavaScript with Canvas 2D rendering and no build step.</p>

@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A panel of three large language models (Llama 3.3 70B via Groq, GPT-4.1 and Gemini 2.5 Pro) annotates eight types of creative thinking in QMSum meeting transcripts, returning structured JSON spans against a fixed codebook.</li><li>A controlled two-condition experiment runs every model on the same transcript with and without its peers' previous annotations as few-shot examples, and inter-annotator agreement is measured as micro-averaged pairwise span F1.</li><li>Peer examples raised mean agreement from 0.185 to 0.216 (paired t-test, t(38) = 4.20, p &lt; 0.001), with no trend over iterations in either condition.</li><li>I wrote the experiment loop that runs the panel and routes peer annotations between models, and wrote most of the prompts.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A <strong>panel of three large language models</strong> (Llama 3.3 70B via Groq, GPT-4.1 and Gemini 2.5 Pro) annotates eight types of creative thinking in QMSum meeting transcripts, returning <strong>structured JSON spans</strong> against a fixed codebook.</li><li>A <strong>controlled two-condition experiment</strong> runs every model on the same transcript with and without its peers' previous annotations as few-shot examples, and inter-annotator agreement is measured as micro-averaged pairwise span F1.</li><li>Peer examples raised mean agreement <strong>from 0.185 to 0.216</strong> (paired t-test, t(38) = 4.20, p &lt; 0.001), with no trend over iterations in either condition.</li><li><strong>I wrote the experiment loop</strong> that runs the panel and routes peer annotations between models, and wrote most of the prompts.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before, in the spirit of a panel of experts that calibrates over time.</p>

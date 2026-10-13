@@ -38,6 +38,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 .nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
 .nav .container { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
 .logo { font-family: var(--display); font-weight: 700; font-size: 1.15rem; text-decoration: none; white-space: nowrap; }
+.logo { position: relative; padding: 4px 10px; margin-left: -10px; }
+.logo::before, .logo::after { content: ""; position: absolute; width: 10px; height: 10px; border: 0 solid var(--accent); }
+.logo::before { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+.logo::after { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
 .nav ul { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; font-size: 0.95rem; }
 .nav ul a { text-decoration: none; color: var(--muted); padding-block: 4px; border-bottom: 2px solid transparent; }
 .nav ul a:hover { color: var(--fg); }
@@ -228,7 +232,7 @@ footer a:hover { color: var(--fg); }
   .band { padding: 28px 22px; }
   .next a { max-width: 100%; }
 }
-@media (max-width: 400px) { .logo { font-size: 1rem; } .nav ul { gap: 12px; } }
+@media (max-width: 400px) { .logo { font-size: 0.92rem; padding-inline: 8px; margin-left: -8px; } .nav .container { padding-inline: 14px; } .nav ul { gap: 8px; font-size: 0.82rem; } }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .btn, .card, .contact-item, .email-item { transition: none; }
@@ -241,3 +245,6 @@ footer a:hover { color: var(--fg); }
 .prose .tldr ul { margin: 0; padding-left: 1.1em; }
 .prose .tldr li { margin-bottom: 4px; }
 .prose .tldr li:last-child { margin-bottom: 0; }
+
+/* inline emphasis */
+strong { font-weight: 700; color: var(--fg); background: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 22%, transparent) 62%); padding-inline: 1px; }

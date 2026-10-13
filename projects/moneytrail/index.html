@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Moneytrail is a local Python tool that imports CSV exports from four Dutch banks into DuckDB and reports who you pay and which payments repeat.</li><li>Merchants are resolved by rule-based name normalisation and union-find clustering on shared IBANs and string similarity, and recurring payments are found by fitting amount bands to five billing schedules with tolerance-based gap tests.</li><li>Evaluation uses labelled synthetic transactions in all four bank formats, with a held-out set written separately from the rules, scored with B-cubed F1 and series-level precision and recall.</li><li>On the held-out set merchant grouping reaches a B-cubed F1 of 0.952 to 0.961 and recurring series are found with a recall of 0.944.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Moneytrail is a local Python tool that imports CSV exports from four Dutch banks into <strong>DuckDB</strong> and reports who you pay and which payments repeat.</li><li>Merchants are resolved by rule-based name normalisation and <strong>union-find clustering</strong> on shared IBANs and string similarity, and recurring payments are found by fitting amount bands to five billing schedules with tolerance-based gap tests.</li><li>Evaluation uses labelled synthetic transactions in all four bank formats, with a held-out set written separately from the rules, scored with B-cubed F1 and series-level precision and recall.</li><li>On the held-out set merchant grouping reaches a <strong>B-cubed F1 of 0.952 to 0.961</strong> and recurring series are found with a <strong>recall of 0.944</strong>.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally on DuckDB, so the data never leaves the machine and no connection to a bank account is needed. The core problems are entity resolution (working out who a payment went to) and periodicity detection, both measured against labelled synthetic data.</p>

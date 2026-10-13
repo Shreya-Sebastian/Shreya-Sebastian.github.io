@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=3f61b8e2">
+<link rel="stylesheet" href="/assets/style.css?v=c2e94a70">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -46,7 +46,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>My BSc thesis at Leiden University classifies microscope Z-stacks of nettle-family pollen into three classes (Parietaria, Urtica dioica/urens and Urtica membranacea) using every focal plane of the stack.</li><li>The stacks are standardised to 20 frames of 224 × 224 pixels and classified with 3D convolutional networks in PyTorch: a small baseline 3D CNN and a ResNet3D (r3d_18) trained with cross-entropy and AdamW.</li><li>On about 600 stacks, a ResNet3D trained on the whole stack reached 95 percent test accuracy and a weighted F1 of 0.949, ahead of the baseline and of models trained on subsections of the stack.</li><li>Experiments on learning rate, augmentation, batch size, stack depth and transfer learning from video showed that the outer focal planes carry useful information and that video pretraining did not help.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>My BSc thesis at Leiden University classifies microscope Z-stacks of nettle-family pollen into three classes (Parietaria, Urtica dioica/urens and Urtica membranacea) using every focal plane of the stack.</li><li>The stacks are standardised to 20 frames of 224 × 224 pixels and classified with <strong>3D convolutional networks in PyTorch</strong>: a small baseline 3D CNN and a ResNet3D (r3d_18) trained with cross-entropy and AdamW.</li><li>On about 600 stacks, a ResNet3D trained on the whole stack reached <strong>95 percent test accuracy and a weighted F1 of 0.949</strong>, ahead of the baseline and of models trained on subsections of the stack.</li><li>Experiments on learning rate, augmentation, batch size, stack depth and <strong>transfer learning from video</strong> showed that the outer focal planes carry useful information and that video pretraining did not help.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Telling the pollen of Parietaria and Urtica, two genera of the nettle family (Urticaceae), apart under the microscope is hard because the grains look very similar. A microscope captures each grain as a Z-stack: a series of images at different focal depths, each with a different part of the grain in focus. Earlier work classified these grains from 2D projections of the stack, which compress the depth information into a single image.</p>
