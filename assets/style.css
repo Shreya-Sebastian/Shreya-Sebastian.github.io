@@ -28,9 +28,11 @@
 html { scroll-behavior: smooth; scroll-padding-top: 76px; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.65; min-height: 100vh; display: flex; flex-direction: column; }
 main { flex: 1; }
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 20; background: var(--fg); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-weight: 600; text-decoration: none; }
+.skip-link:focus { top: 12px; }
 .container { max-width: 1080px; margin: 0 auto; padding-inline: 24px; }
 .narrow { max-width: 760px; }
 
