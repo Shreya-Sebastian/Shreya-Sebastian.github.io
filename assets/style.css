@@ -1,7 +1,7 @@
 :root {
   --bg: #ffffff;
   --surface: #f5f7fb;
-  --fg: #0f1b33;
+  --fg: #0a1530;
   --muted: #55627a;
   --line: #e1e6ef;
   --accent: #5426b0;
@@ -16,8 +16,8 @@
 }
 /* dark navy bands: nav, page headers, closing band, footer */
 .nav, .hero, .page-head, .p-hero, .band, footer {
-  --bg: #0f1d3a; --surface: #172a50; --fg: #ffffff; --muted: #b4bfd4;
-  --line: #26395f; --accent: #a58cf5; --accent-soft: #2a2f5e; --code-bg: #172a50;
+  --bg: #08142e; --surface: #102049; --fg: #ffffff; --muted: #b4bfd4;
+  --line: #1d2f5c; --accent: #a58cf5; --accent-soft: #2a2f5e; --code-bg: #102049;
   background: var(--bg); color: var(--fg);
 }
 
@@ -35,7 +35,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 .narrow { max-width: 760px; }
 
 /* nav */
-.nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
 .nav .container { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
 .logo { font-family: var(--display); font-weight: 700; font-size: 1.15rem; text-decoration: none; white-space: nowrap; }
 .nav ul { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; font-size: 0.95rem; }
