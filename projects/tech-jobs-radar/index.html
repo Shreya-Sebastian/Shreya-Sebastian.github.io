@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Tech Jobs Radar is a live job search site, <strong>built and run by me</strong>, that lists tech, software, data and IT vacancies in the Netherlands read directly from employers' own career sites.</li><li>Redis queue workers crawl applicant tracking system APIs and schema.org <code>JobPosting</code> pages, and a pipeline normalises, deduplicates, classifies and extracts each posting into a <strong>typed Pydantic schema stored in Postgres and served by FastAPI</strong>.</li><li>Extraction is <strong>gated in CI against a golden set of 46 postings</strong> (the build fails below 0.70 on the mean of nine field accuracies and skills F1), and the site's filters are scored on 200 held-out live postings with 95% confidence intervals.</li><li>Production runs on <strong>k3s on AWS EC2 within a 2 GB memory budget</strong>, deployed with <strong>Helm, Terraform, GitHub Actions and Flux</strong> in a GitOps workflow.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>Tech Jobs Radar is a live job search site that I <strong>designed and run</strong>, listing tech, software, data and IT vacancies in the Netherlands read directly from employers' own career sites.</li><li>Redis queue workers crawl applicant tracking system APIs and schema.org <code>JobPosting</code> pages, and a pipeline normalises, deduplicates, classifies and extracts each posting into a <strong>typed Pydantic schema stored in Postgres and served by FastAPI</strong>.</li><li>Extraction is <strong>gated in CI against a golden set of 46 postings</strong> (the build fails below 0.70 on the mean of nine field accuracies and skills F1), and the site's filters are scored on 200 held-out live postings with 95% confidence intervals.</li><li>Production runs on <strong>k3s on AWS EC2 within a 2 GB memory budget</strong>, deployed with <strong>Helm, Terraform, GitHub Actions and Flux</strong> in a GitOps workflow.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Tech Jobs Radar is a live job search site for tech, software, data and IT vacancies in the Netherlands, collected directly from employers' own career sites. Each posting is classified as tech or non-tech and annotated with structured fields: role family, skills, seniority, experience, degree, salary range, posting language, whether Dutch is required, visa sponsorship, remote policy and, for internships, whether university enrolment is required. Every listing links back to the employer's original page, and optional accounts keep a profile and saved jobs across devices.</p>
@@ -73,7 +73,7 @@
 <p>Periodic jobs are queued by a scheduler thread inside the worker rather than as Kubernetes CronJobs, which start a fresh process for every run and would strain the memory budget. They take priority over crawls and run one at a time in a forked child process that frees its memory on exit. Each time slot is claimed in Redis with an atomic set-if-absent, so several workers never queue the same run twice.</p>
 
 <h3>Lifecycle</h3>
-<p>Each posting is normalised into canonical fields, including a city, a duplicate key from employer, title and city, and a content hash; classification and extraction run only when a posting is new or its hash changes, which keeps re-crawls cheap. Contact details are removed from posting text before storage. Postings that disappear from a board are closed, with two guards: if a board that had at least ten postings suddenly returns fewer than half as many, the response is treated as partial and nothing is closed, and an employer's expiry date is ignored for a source when more than 80% of its dated postings appear expired, since the field is then a template value.</p>
+<p>Each posting is normalised into canonical fields, including a city, a duplicate key from employer, title and city, and a content hash. Classification and extraction run only when a posting is new or its hash changes, which keeps re-crawls cheap. Contact details are removed from posting text before storage. Postings that disappear from a board are closed, with two guards: if a board that had at least ten postings suddenly returns fewer than half as many, the response is treated as partial and nothing is closed, and an employer's expiry date is ignored for a source when more than 80% of its dated postings appear expired, since the field is then a template value.</p>
 
 <h3>Deduplication</h3>
 <p>Duplicates are linked to one canonical posting rather than deleted, by six rules: the same vacancy on several sources, reposts under a new URL, the same original URL, per-city copies recognised by identical text once city names and numbers are removed, the same page under another language segment of its URL, and Dutch and English versions of one vacancy. The employer's own copy is preferred over an agency's.</p>
@@ -87,7 +87,7 @@
 <p>Requirements are parsed clause by clause, so that "Dutch is a plus" is not a Dutch requirement, office days in the same sentence turn "remote" into hybrid, and negation applies only within its clause. The rules are versioned, so stored postings can be re-extracted after a change. The rule-based extractor serves as a cheap, deterministic baseline that any LLM extractor would have to beat on the golden set.</p>
 
 <h3>Serving</h3>
-<p>API processes keep the live rows in memory. When the pipeline changes the data it increments a version key in Redis; each API process reloads on its next request, and heavy responses are cached under the current version, so a new version starts a fresh cache namespace without explicit invalidation.</p>
+<p>API processes keep the live rows in memory. When the pipeline changes the data it increments a version key in Redis. Each API process reloads on its next request, and heavy responses are cached under the current version, so a new version starts a fresh cache namespace without explicit invalidation.</p>
 
 <h2>Evaluation</h2>
 <p>The extractor is scored field by field against a golden set of 46 postings, built by correcting the rule outputs: exact match for scalar fields, and set precision, recall and F1 for skill lists. This evaluation runs in CI on every push as a quality gate, and the build fails if the mean of nine field accuracies and the skills F1 falls below 0.70, so a rule change cannot silently degrade extraction.</p>

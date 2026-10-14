@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A proof of concept for loss-free sensor data ingestion in a smart home architecture, built for the TU Delft Software Architecture course, where <strong>I built most of the proof of concept</strong> and wrote the report sections on it.</li><li>Sensors use store-and-forward with a persistent local buffer and chunked resynchronisation, sending readings over HTTP to a <strong>FastAPI service</strong> that validates them with Pydantic and publishes them to a <strong>durable RabbitMQ queue</strong> read by acknowledging consumers.</li><li>Fault-injection scenarios, unit tests with mocked HTTP failures and <strong>load tests</strong> (5,000 readings in one request, 200 concurrent requests, 1,000 messages from 50 sensors) confirm that every disconnected sensor empties its buffer and every request is accepted.</li><li>A three-stage <strong>GitLab CI pipeline</strong> runs style checks, builds the Docker image and runs all tests inside it against a RabbitMQ service.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>A proof of concept for loss-free sensor data ingestion in a smart home architecture, made for the TU Delft Software Architecture course. <strong>I built most of the proof of concept</strong> and wrote the report sections on it.</li><li>Sensors use store-and-forward with a persistent local buffer and chunked resynchronisation, sending readings over HTTP to a <strong>FastAPI service</strong> that validates them with Pydantic and publishes them to a <strong>durable RabbitMQ queue</strong> read by acknowledging consumers.</li><li>Fault-injection scenarios, unit tests with mocked HTTP failures and <strong>load tests</strong> (5,000 readings in one request, 200 concurrent requests, 1,000 messages from 50 sensors) confirm that every disconnected sensor empties its buffer and every request is accepted.</li><li>A three-stage <strong>GitLab CI pipeline</strong> runs style checks, builds the Docker image and runs all tests inside it against a RabbitMQ service.</li></ul></div>
 
 <h2>Context</h2>
 <p>For the Software Architecture course our team designed a smart home system that learns household routines from sensor data. To keep sensitive data under the user's control while still allowing remote access, the design splits the system into a local hub, which handles data collection, storage, routine learning and device communication, and a set of cloud services for remote access, authentication, updates and notifications. The hub follows a microkernel architecture, with a core and independent plug-ins, and the cloud side a microservice architecture. I built most of the proof of concept and wrote the report sections on it.</p>
@@ -61,7 +61,7 @@
 <p>Availability is defined as sensors continuing to produce readings while disconnected, with every reading reaching the queue once the connection returns.</p>
 
 <h2>Architecture</h2>
-<figure><img src="/img/sensor_poc_architecture.png" width="1699" height="1390" alt="Sensors with local buffers send HTTP requests to an ingestion server, which publishes to a message queue read by a consumer" loading="lazy"><figcaption>Sensors send readings over HTTP to the ingestion server, which publishes them to a queue; each sensor keeps a local buffer for when the connection is down.</figcaption></figure>
+<figure><img src="/img/sensor_poc_architecture.png" width="1699" height="1390" alt="Sensors with local buffers send HTTP requests to an ingestion server, which publishes to a message queue read by a consumer" loading="lazy"><figcaption>Sensors send readings over HTTP to the ingestion server, which publishes them to a queue. Each sensor keeps a local buffer for when the connection is down.</figcaption></figure>
 <pre>sensor (buffer) -> HTTP batch -> ingestion service (validate) -> durable queue -> consumer (ack)</pre>
 <ul>
 <li><b>Ingestion service.</b> A stateless FastAPI REST endpoint that accepts a batch of readings, validates each against a Pydantic schema (reading identifier, sensor identifier, type, value and timestamp) and publishes it to RabbitMQ as a persistent message. It returns 503 when the broker is unreachable, so the sensor treats a broker outage like a network outage, and exposes a health endpoint.</li>
@@ -76,10 +76,10 @@
 <p>The report compares four transports between sensors and the ingestion service, judged on reliability under intermittent connectivity, observability and operational complexity:</p>
 <div class="table-wrap"><table>
 <tr><th>Protocol</th><th>For</th><th>Against</th></tr>
-<tr><td>REST</td><td>Firewall friendly; simple request and response with explicit chunked backlog upload; easy validation and backoff</td><td>More overhead per message than MQTT; not a push protocol</td></tr>
-<tr><td>MQTT</td><td>Designed for IoT; persistent sessions; low bandwidth and battery use</td><td>Needs a broker; more moving parts; ordering subtleties at scale</td></tr>
-<tr><td>WebSockets</td><td>Low latency; server push; full duplex</td><td>Needs backpressure and reconnection logic; harder to batch</td></tr>
-<tr><td>UDP</td><td>Lightweight; suits constrained networks</td><td>Network traversal; harder to observe</td></tr>
+<tr><td>REST</td><td>Firewall friendly, simple request and response with explicit chunked backlog upload, easy validation and backoff</td><td>More overhead per message than MQTT, not a push protocol</td></tr>
+<tr><td>MQTT</td><td>Designed for IoT, persistent sessions, low bandwidth and battery use</td><td>Needs a broker, more moving parts, ordering subtleties at scale</td></tr>
+<tr><td>WebSockets</td><td>Low latency, server push, full duplex</td><td>Needs backpressure and reconnection logic, harder to batch</td></tr>
+<tr><td>UDP</td><td>Lightweight, suits constrained networks</td><td>Network traversal, harder to observe</td></tr>
 </table></div>
 <p>REST was chosen for its ease of handling and its suitability for a smart home application.</p>
 
@@ -97,7 +97,7 @@
 <h3>Unit tests</h3>
 <p>Mocked HTTP responses test the sensor without a live server: the buffer is reloaded on start, connection errors and 503 responses both lead to buffering and offline mode, a successful chunk removes exactly the readings sent, and a failed chunk stays in the buffer with new readings appended after it.</p>
 <h3>Load tests</h3>
-<p>Run against the full architecture of server, broker and consumer, the load tests cover three scenarios: 5,000 readings in one request, as from a sensor resynchronising a large backlog; 200 concurrent requests, as from many sensors sending at once; and a sustained stream of 1,000 messages from 50 sensors, which checks that the consumer keeps pace with publishing so the queue does not grow without bound. Each passes only if every request is accepted.</p>
+<p>Run against the full architecture of server, broker and consumer, the load tests cover three scenarios. The first sends 5,000 readings in one request, as from a sensor resynchronising a large backlog. The second sends 200 concurrent requests, as from many sensors sending at once. The third is a sustained stream of 1,000 messages from 50 sensors, which checks that the consumer keeps pace with publishing so the queue does not grow without bound. Each passes only if every request is accepted.</p>
 
 <h2>Continuous integration</h2>
 <p>A three-stage GitLab CI pipeline runs a style stage (compilation check and black), a build stage that builds the Docker image and pushes it to the GitLab container registry, and a test stage that runs the unit, load and fault tests inside that image against a RabbitMQ service.</p>

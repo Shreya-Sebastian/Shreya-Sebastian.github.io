@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>My MSc thesis measures the social inclusion of preschool children with hearing loss from <strong>wearable sensor data</strong>, comparing them with typically hearing peers within each classroom activity context rather than over a whole day.</li><li>Ultra-wideband positions and LENA audio are fused into <strong>21,847 child-minutes</strong>, spatial groups are found as dominant sets of an orientation-aware affinity matrix, and six activity contexts are discovered with a <strong>Gaussian Mixture Model</strong> whose K is chosen by a stability-aware BIC rule.</li><li><strong>Linear mixed models</strong> with per-context contrasts and <strong>false discovery rate correction</strong> show effects that change sign between contexts and cancel out over the day, such as children with hearing loss spending more time in groups during independent work (d = +1.59) and less during peer-driven activity.</li><li>The most consistent finding is peer affiliation: children with hearing loss spend more grouped time in mixed groups than their typically hearing peers in all six contexts, significantly in four.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>My MSc thesis measures the social inclusion of preschool children with hearing loss from <strong>wearable sensor data</strong>, comparing them with typically hearing peers within each classroom activity context rather than over a whole day.</li><li>Ultra-wideband positions and LENA audio are fused into <strong>21,847 child-minutes</strong>, spatial groups are found as dominant sets of an orientation-aware affinity matrix, and six activity contexts are discovered with a <strong>Gaussian Mixture Model</strong> whose K is chosen by a stability-aware BIC rule.</li><li><strong>Linear mixed models</strong> with per-context contrasts and <strong>false discovery rate correction</strong> show effects that change sign between contexts and cancel out over the day, such as children with hearing loss spending more time in groups during independent work (d = +1.59) and less during peer-driven activity.</li><li>The most consistent finding is peer affiliation: children with hearing loss spend more grouped time in mixed groups than their typically hearing peers in all six contexts, significantly in four.</li></ul></div>
 
 
 <h2>Overview</h2>
@@ -77,7 +77,7 @@ LENA audio  -> adult words, overlap, utterances per minute ---------------------
 <h3>Context discovery</h3>
 <p>A full-covariance Gaussian Mixture Model is used rather than k-means because it gives posterior memberships, suited to gradual classroom transitions, and models correlated features. It also has a lower BIC than diagonal and spherical covariance. Hard assignment costs little: the median posterior of the assigned component is 0.90.</p>
 <figure><img src="/img/thesis_k_selection_bic.png" width="1400" height="1244" alt="Mean BIC and mean pairwise ARI for K from 2 to 20, with K = 6 selected" loading="lazy"><figcaption>Twenty GMMs with different seeds for each K. Top: mean BIC. Bottom: agreement between the twenty partitions (mean pairwise ARI), with the 0.80 admissibility threshold.</figcaption></figure>
-<p>Since BIC alone tends to settle on shallow minima that reflect fitting noise, K is selected with a stability-aware rule. For each K from 2 to 20, twenty GMMs are fitted with independent seeds; a K is admissible only if its partitions agree across seeds (mean pairwise adjusted Rand index of at least 0.80), and the admissible K with the lowest mean BIC is chosen. This gives K = 6, and the choice holds for any threshold between 0.70 and 0.85.</p>
+<p>Since BIC alone tends to settle on shallow minima that reflect fitting noise, K is selected with a stability-aware rule. For each K from 2 to 20, twenty GMMs are fitted with independent seeds. A K is admissible only if its partitions agree across seeds (mean pairwise adjusted Rand index of at least 0.80), and the admissible K with the lowest mean BIC is chosen. This gives K = 6, and the choice holds for any threshold between 0.70 and 0.85.</p>
 
 <h3>Statistical inference</h3>
 <p>Each child contributes many correlated minutes, so each outcome is modelled with a linear mixed model: cluster, hearing status and their interaction as fixed effects and a random intercept per child, with per-context Wald contrasts between HL and TH children. Random slopes would be under-identified with 13 children and six clusters. The homophily index, one value per child per context, is tested with Mann-Whitney U. Benjamini-Hochberg false discovery rate correction is applied within each marker's six contrasts, as a family-wise correction would cost too much power in an exploratory study of this size.</p>
@@ -94,7 +94,7 @@ LENA audio  -> adult words, overlap, utterances per minute ---------------------
 <tr><td>4</td><td>Seated guided work</td><td>9.8%</td><td>High adult speech, least movement, teacher at 1.6 m</td></tr>
 <tr><td>5</td><td>Whole-class instruction / read-aloud</td><td>34.8%</td><td>Most adult speech (66 words per minute), teacher closest</td></tr>
 </table></div>
-<p>The labels are post-hoc descriptions of the sensor profiles; all tests are run on cluster numbers. The contexts are qualitatively consistent with an independent manual coding of the daily routine, consulted only after K was fixed.</p>
+<p>The labels are post-hoc descriptions of the sensor profiles. All tests are run on cluster numbers. The contexts are qualitatively consistent with an independent manual coding of the daily routine, consulted only after K was fixed.</p>
 
 <h3>Peer co-presence</h3>
 <figure><img src="/img/thesis_avg_time_group.png" width="1400" height="986" alt="Bar chart of the percentage of each minute spent in a spatial group, by context and hearing status" loading="lazy"><figcaption>Share of each minute spent in a spatial group, by context and hearing status, with 95% confidence intervals over children.</figcaption></figure>
@@ -106,22 +106,22 @@ LENA audio  -> adult words, overlap, utterances per minute ---------------------
 
 <h3>Peer affiliation</h3>
 <figure><img src="/img/thesis_group_demographic.png" width="1400" height="753" alt="Bar charts of time in HL-only, TH-only and mixed groups for TH and HL children by context" loading="lazy"><figcaption>How grouped time is split between HL-only, TH-only and mixed groups, for TH children (left) and HL children (right).</figcaption></figure>
-<p>This is the most consistent asymmetry. TH children's grouped time is concentrated in TH-only groups, while HL children spend more grouped time in mixed groups than TH children in all six contexts, significantly in four. Class composition alone gives TH children a homophily advantage of about 0.08; in the four significant contexts the observed gap is 0.12 to 0.19, and it is as large in teacher-organised contexts as in child-chosen ones.</p>
+<p>This is the most consistent asymmetry. TH children's grouped time is concentrated in TH-only groups, while HL children spend more grouped time in mixed groups than TH children in all six contexts, significantly in four. Class composition alone gives TH children a homophily advantage of about 0.08. In the four significant contexts the observed gap is 0.12 to 0.19, and it is as large in teacher-organised contexts as in child-chosen ones.</p>
 
 <h3>Interpretation</h3>
 <p>Conditioning on context reveals effects that a whole-day comparison averages away. The per-child random intercept matters for the same reason: a simpler ANOVA would report no effect of hearing status on vocal participation, while the mixed model shows that the signal is concentrated in specific contexts. The results were presented to developmental psychologists.</p>
 
 <h2>Key takeaways</h2>
 <ul>
-<li>Context matters: some differences between children with and without hearing loss changed sign between activity contexts and cancelled out over the day, so a daily average would have hidden them.</li>
-<li>Peer affiliation was the most consistent finding: children with hearing loss spent more grouped time in mixed groups than their typically hearing peers in all six contexts, significantly in four.</li>
-<li>Unsupervised clustering on fused positioning and audio data can recover interpretable classroom contexts, and choosing the number of clusters for stability rather than by BIC alone keeps them reproducible.</li>
+<li>Analyses should be conditioned on context, since effects of opposite sign can cancel out in a daily average.</li>
+<li>Peer affiliation was the most consistent difference, with the same direction in all six contexts.</li>
+<li>Selecting the number of clusters for stability rather than by BIC alone yielded contexts that were reproducible across random seeds.</li>
 </ul>
 <p>The recordings of minors were collected under a research-ethics protocol that does not permit public release.</p>
 
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>MSc thesis, TU Delft, 2026</dd></div><div><dt>Supervision</dt><dd>Hayley Hung and Stephanie Tan (Socially Perceptive Computing Lab, TU Delft); Daniel Messinger and Lynn Perry (University of Miami)</dd></div><div><dt>Data</dt><dd>13 children (6 with hearing loss, 7 typically hearing), 13 recording days</dd></div><div><dt>Stack</dt><dd>Python, pandas, NumPy, SciPy, scikit-learn, statsmodels, matplotlib</dd></div></dl>
+    <dl><div><dt>Type</dt><dd>MSc thesis, TU Delft, 2026</dd></div><div><dt>Supervision</dt><dd>Hayley Hung and Stephanie Tan (Socially Perceptive Computing Lab, TU Delft), with Daniel Messinger and Lynn Perry (University of Miami)</dd></div><div><dt>Data</dt><dd>13 children (6 with hearing loss, 7 typically hearing), 13 recording days</dd></div><div><dt>Stack</dt><dd>Python, pandas, NumPy, SciPy, scikit-learn, statsmodels, matplotlib</dd></div></dl>
     <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Activity_Contexts_Clustering">Code ↗</a></div>
   </aside>
 </div>

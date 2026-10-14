@@ -38,7 +38,7 @@ function processGesture(raw) {
   const smoothed = majorityVote(recent);
 
   const el = document.getElementById('gesture-label');
-  if (el) el.textContent = smoothed === 'none' ? '—' : smoothed.replace('_', ' ');
+  if (el) el.textContent = smoothed === 'none' ? 'None' : smoothed.replace('_', ' ');
 
   const now = Date.now();
   if (smoothed !== activeGesture) {

@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>An interactive web visualisation of <strong>6,393 significant earthquakes and 2,512 tsunamis</strong>, from ancient records to 2025, built as a group project with <strong>D3, OpenLayers and Vite</strong>.</li><li>A world map, a timeline, a scatterplot and a detail view are coordinated through linked brushing, so a selection in any view filters the other three.</li><li><strong>My part was the timeline</strong>: a brushable heatmap grid of year ranges against months with adaptive binning, drill-down navigation and a log-scaled sequential colour encoding.</li><li>The records were converted from tab-separated exports to GeoJSON in Python, and the site is deployed to GitHub Pages through <strong>continuous deployment</strong>.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>An interactive web visualisation of <strong>6,393 significant earthquakes and 2,512 tsunamis</strong>, from ancient records to 2025, built as a group project with <strong>D3, OpenLayers and Vite</strong>.</li><li>A world map, a timeline, a scatterplot and a detail view are coordinated through linked brushing, so a selection in any view filters the other three.</li><li><strong>My part was the timeline</strong>: a brushable heatmap grid of year ranges against months with adaptive binning, drill-down navigation and a log-scaled sequential colour encoding.</li><li>The records were converted from tab-separated exports to GeoJSON in Python, and the site is deployed to GitHub Pages through <strong>continuous deployment</strong>.</li></ul></div>
 
 <h2>Overview</h2>
 <p>An interactive visualisation of 6,393 significant earthquakes and 2,512 tsunamis, from ancient records to 2025, built with D3 for the timeline, scatterplot and detail view, OpenLayers for the map and heatmap, and Vite for builds. Four coordinated views use linked brushing: a selection in any view filters the other three. The design goal is to let a user move between where, when and how severe: find a cluster on the map, see when it happened, compare its magnitude and impact with the rest of the record, and read the full entry for a single event.</p>
@@ -58,7 +58,7 @@
 <p>The earthquake and tsunami records were exported as tab-separated files and converted to GeoJSON in Python. Every row with valid coordinates becomes a point feature, and all non-empty fields are kept as properties, so missing values are absent rather than encoded as zeros. Tectonic plate boundaries are loaded as a third GeoJSON layer. The attributes cover location, date and time, magnitude, focal depth, Modified Mercalli Intensity, and impact measures such as deaths, injuries, damage and houses destroyed or damaged, many with a recorded category that stands in where the exact figure is missing. Earthquakes and tsunamis are linked through a tsunami identifier on the earthquake record.</p>
 
 <h2>Linked views architecture</h2>
-<p>All three datasets are loaded once at start-up and held in memory, and every view works on GeoJSON features directly, so a selection is simply a subset of the same feature objects and needs no conversion between views. Each view exposes a draw and an update operation; a selection in one view passes the selected records to the update of the others, and each applies them in its own way:</p>
+<p>All three datasets are loaded once at start-up and held in memory, and every view works on GeoJSON features directly, so a selection is simply a subset of the same feature objects and needs no conversion between views. Each view exposes a draw and an update operation. A selection in one view passes the selected records to the update of the others, and each applies them in its own way:</p>
 <div class="table-wrap"><table>
 <tr><th>Receiving view</th><th>What it does with a selection</th></tr>
 <tr><td>World map</td><td>Shows only the selected earthquakes, in both the point and the heatmap layer.</td></tr>
@@ -75,10 +75,10 @@
 <h3>Timeline</h3>
 <p>The records span several thousand years and are very unevenly distributed, so a histogram over time does not work. I built the timeline as a heatmap grid of year ranges against months, with adaptive binning: range width follows the span of the data shown, 500 years for spans over 500 years, then centuries, decades and single years once the span is ten years or less. Counts are aggregated per year and month and then summed per range, so each cell holds the number of events in one month column of one year range.</p>
 <ul>
-<li>Brushing a block of cells selects a timeframe and filters the other views; the brush is resolved into the year ranges and months it overlaps, so a selection always follows the grid. Selected cells are outlined, which keeps a selection visible over empty cells, and a status line reports the selection size. An empty selection says so and resets the other views.</li>
+<li>Brushing a block of cells selects a timeframe and filters the other views. The brush is resolved into the year ranges and months it overlaps, so a selection always follows the grid. Selected cells are outlined, which keeps a selection visible over empty cells, and a status line reports the selection size. An empty selection says so and resets the other views.</li>
 <li>Clicking a year range drills down into finer ranges. Navigation keeps a stack of zoom levels: only drilling down adds a level and only the back button removes one, while a selection from another view starts a new stack.</li>
 <li>Records without a month (402, mostly historical) get their own selectable Unknown column, set slightly apart from the months.</li>
-<li>Cell colour uses a log-scaled sequential encoding on a multi-hue palette, so sparse ranges stay visible next to dense ones; empty cells stay neutral grey, and selections switch to a contrasting palette. A legend with ticks at powers of ten shows the scale.</li>
+<li>Cell colour uses a log-scaled sequential encoding on a multi-hue palette, so sparse ranges stay visible next to dense ones. Empty cells stay neutral grey, and selections switch to a contrasting palette. A legend with ticks at powers of ten shows the scale.</li>
 </ul>
 </div>
 </div>
@@ -88,9 +88,9 @@
 <div>
 <p class="eyebrow">View 2</p>
 <h3>World map</h3>
-<p>An OpenLayers map stacks an OpenStreetMap base layer, tectonic plate boundaries, a heatmap layer and the earthquake points. Dot size and colour can encode magnitude, focal depth, intensity or impact measures, with linear scales for magnitude and intensity and logarithmic scales for depth and impact; colour can also show the country or whether an earthquake caused a tsunami.</p>
+<p>An OpenLayers map stacks an OpenStreetMap base layer, tectonic plate boundaries, a heatmap layer and the earthquake points. Dot size and colour can encode magnitude, focal depth, intensity or impact measures, with linear scales for magnitude and intensity and logarithmic scales for depth and impact. Colour can also show the country or whether an earthquake caused a tsunami.</p>
 <ul>
-<li>A switch replaces the points with a magnitude-weighted heatmap; another filters to tsunami-causing earthquakes. Weights are scaled down so that dense regions do not saturate.</li>
+<li>A switch replaces the points with a magnitude-weighted heatmap. Another filters to tsunami-causing earthquakes. Weights are scaled down so that dense regions do not saturate.</li>
 <li>Click and box selection, including boxes across the 180th meridian, feed the linked views.</li>
 <li>Here the map shows only the earthquakes from the timeline selection above.</li>
 </ul>
