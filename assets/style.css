@@ -272,6 +272,6 @@ footer a:hover { color: var(--fg); }
 .prose .tldr li { margin-bottom: 4px; }
 .prose .tldr li:last-child { margin-bottom: 0; }
 
-/* key phrases: plain emphasis */
-strong { font-weight: 700; color: var(--fg); }
+/* inline emphasis */
+strong { font-weight: 700; color: var(--fg); background: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 22%, transparent) 62%); padding-inline: 1px; }
 

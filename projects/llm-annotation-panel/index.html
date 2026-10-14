@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,10 +49,10 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A <strong>panel of three large language models</strong> (Llama 3.3 70B via Groq, GPT-4.1 and Gemini 2.5 Pro) annotates eight types of creative thinking in QMSum meeting transcripts, returning <strong>structured JSON spans</strong> against a fixed codebook.</li><li>A <strong>controlled two-condition experiment</strong> runs every model on the same transcript with and without its peers' previous annotations as few-shot examples, and inter-annotator agreement is measured as micro-averaged pairwise span F1.</li><li>Peer examples raised mean agreement <strong>from 0.185 to 0.216</strong> (paired t-test, t(38) = 4.20, p &lt; 0.001), with no trend over iterations in either condition.</li><li><strong>I wrote the experiment loop</strong> that runs the panel and routes peer annotations between models, and wrote most of the prompts.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>A <strong>panel of three large language models</strong> (Llama 3.3 70B via Groq, GPT-4.1 and Gemini 2.5 Pro) annotates eight types of creative thinking in QMSum meeting transcripts, returning <strong>structured JSON spans</strong> against a fixed codebook.</li><li>A <strong>controlled two-condition experiment</strong> runs every model on the same transcript with and without its peers' previous annotations as few-shot examples, and inter-annotator agreement is measured as micro-averaged pairwise span F1.</li><li>Peer examples raised mean agreement <strong>from 0.185 to 0.216</strong> (paired t-test, t(38) = 4.20, p &lt; 0.001), with no trend over iterations in either condition.</li><li><strong>I wrote the experiment loop</strong> that runs the panel and routes peer annotations between models, and wrote most of the prompts.</li></ul></div>
 
 <h2>Overview</h2>
-<p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before, in the spirit of a panel of experts that calibrates over time.</p>
+<p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before.</p>
 <p>The panel has three members: Llama 3.3 70B (served through Groq), GPT-4.1 and Gemini 2.5 Pro, each accessed through its provider's API. The research question is narrow: does showing a model its peers' earlier annotations as in-context examples change how much the panel agrees, compared with the same models annotating the same text alone?</p>
 <p>We worked on it as a team: other members built the model interfaces, the preprocessing, the agreement metric, the plots and the statistical analysis. My part was the experiment loop, which runs the panel over the iterations and both conditions and routes the peer annotations between models, including running both conditions on the same transcript in every iteration. I also wrote most of the prompts.</p>
 
@@ -90,7 +90,7 @@
 
 <h3>Measuring agreement</h3>
 <p>There is no reference annotation, so the measure is agreement between annotators rather than accuracy against a gold standard. Each annotated passage is then located in the transcript by exact word-sequence matching, which turns it into a span of word positions. Passages that cannot be found verbatim are left out of the scoring.</p>
-<p>Two annotations agree when they carry the same label and their spans share at least one word, with each annotation matched only once. This partial-overlap criterion lets annotations of the same idea with slightly different boundaries count as agreement. For each pair of models, one is treated as the reference and the other as the prediction; since F1 is symmetric in false positives and false negatives, the choice of reference does not matter. True positives, false positives and false negatives are summed over all three pairs before computing F1, giving one micro-averaged pairwise F1 per iteration and condition. Pooling the counts weights each pair by how much it annotated, rather than letting a pair with very few annotations dominate an average of per-pair scores.</p>
+<p>Two annotations agree when they carry the same label and their spans share at least one word, with each annotation matched only once. This partial-overlap criterion lets annotations of the same idea with slightly different boundaries count as agreement. For each pair of models, one is treated as the reference and the other as the prediction. Since F1 is symmetric in false positives and false negatives, the choice of reference does not matter. True positives, false positives and false negatives are summed over all three pairs before computing F1, giving one micro-averaged pairwise F1 per iteration and condition. Pooling the counts weights each pair by how much it annotated, rather than letting a pair with very few annotations dominate an average of per-pair scores.</p>
 
 <h3>Statistical analysis</h3>
 <p>Scores are averaged per iteration over the five runs, and only iterations with a score in both conditions are compared, which gives 39 paired observations. Normality of the per-iteration scores is checked with Shapiro-Wilk before applying a paired t-test to the two conditions. Kendall's tau between iteration number and F1, computed separately for each condition, tests whether agreement drifts as the panel accumulates feedback. As a rank correlation, it detects any monotonic trend without assuming that the change is linear.</p>
@@ -106,9 +106,9 @@
 
 <h2>Key takeaways</h2>
 <ul>
-<li>Showing each model its peers' earlier annotations as examples raised agreement from 0.185 to 0.216, and the gain came from the examples in the prompt rather than a drift over time.</li>
-<li>Asking for verbatim passages instead of paraphrases makes LLM output machine-checkable, since every annotation can be located in the source text.</li>
-<li>Agreement is not accuracy: a panel can converge on the same wrong label, so an automated annotator needs a small human-verified set before it is used at scale.</li>
+<li>Including peers' earlier annotations in the prompt increased agreement between the models, and the effect did not accumulate over iterations.</li>
+<li>Requiring verbatim passages makes LLM output verifiable against the source text.</li>
+<li>Agreement does not imply accuracy. A small human-verified set remains necessary before such a panel is applied at scale.</li>
 </ul>
 
   </article>

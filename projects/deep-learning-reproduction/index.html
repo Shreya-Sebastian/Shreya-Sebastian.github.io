@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,11 +49,11 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A <strong>reimplementation in PyTorch</strong> of MFEF (Zhou et al., 2023), a multi-view convolutional network for underwater image enhancement, built from the paper's description because <strong>no public code was available</strong>.</li><li>The network fuses the raw image with white-balanced and CLAHE views through residual enhancement modules, multi-kernel fusion and pixel-weighted channel attention at three scales, followed by coarse-to-fine reconstruction.</li><li>Trained on the 890 image pairs of the UIEB benchmark with an L1 plus VGG-16 perceptual loss, it produced outputs visually close to the references and was evaluated with five full-reference and no-reference quality metrics.</li><li>In a team of four for the TU Delft Deep Learning course, <strong>I built the model architecture with a teammate</strong>, contributed to preprocessing and wrote the blog post.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>A <strong>reimplementation in PyTorch</strong> of MFEF (Zhou et al., 2023), a multi-view convolutional network for underwater image enhancement, built from the paper's description because <strong>no public code was available</strong>.</li><li>The network fuses the raw image with white-balanced and CLAHE views through residual enhancement modules, multi-kernel fusion and pixel-weighted channel attention at three scales, followed by coarse-to-fine reconstruction.</li><li>Trained on the 890 image pairs of the UIEB benchmark with an L1 plus VGG-16 perceptual loss, it produced outputs visually close to the references and was evaluated with five full-reference and no-reference quality metrics.</li><li>In a team of four for the TU Delft Deep Learning course, <strong>I built the model architecture with a teammate</strong>, contributed to preprocessing and wrote the blog post.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Underwater photos lose colour and contrast because water absorbs and scatters light. Absorption varies with wavelength and often suppresses the red channel, leaving a blue or green cast, and scattering adds blur.</p>
-<p>The paper we reproduced (Zhou et al., 2023) enhances underwater images with MFEF, a multi-view fusion network. Rather than learning from a single input, it gives the network several versions of the same image, each of which exposes a different kind of information, and lets it learn how to combine them. With no public code available, we reimplemented the method in PyTorch from the paper's description and trained it on the UIEB benchmark. This was a team of four for the TU Delft Deep Learning course; I built the model architecture with a teammate, contributed to preprocessing and wrote the blog post.</p>
+<p>The paper we reproduced (Zhou et al., 2023) enhances underwater images with MFEF, a multi-view fusion network. Rather than learning from a single input, it gives the network several versions of the same image, each of which exposes a different kind of information, and lets it learn how to combine them. With no public code available, we reimplemented the method in PyTorch from the paper's description and trained it on the UIEB benchmark. This was a team of four for the TU Delft Deep Learning course. I built the model architecture with a teammate, contributed to preprocessing and wrote the blog post.</p>
 
 <h2>Data and inputs</h2>
 <figure><img src="/img/dl_repro_views.jpg" width="950" height="1043" alt="Grid of underwater images: raw, white-balanced, contrast-enhanced and reference versions" loading="lazy"><figcaption>From top to bottom: raw images, the white-balanced view, the contrast-enhanced (CLAHE) view and the reference images.</figcaption></figure>
@@ -83,7 +83,7 @@
 <p>A second residual stage follows as a chain: the output of one REM is concatenated with the next fusion output before entering the next REM, so later modules see both fused features and the refinements made before them. Concatenation raises the channel count, while each result must be added pixel-wise to one of the three-channel input views. We therefore placed a 1 × 1 convolution after each of these REMs to project back to three channels, a choice the paper left open. Adding the result back onto the original, white-balanced and CLAHE images means that this stage learns a correction to each view rather than a new image.</p>
 
 <h3>Multi-scale channel attention</h3>
-<p>Each corrected view is then encoded at three scales. The same 3 × 3 convolution is applied three times with 2 × 2 max pooling in between, giving feature maps at full, half and quarter resolution. The paper's figure shows three convolution paths joined by unspecified dense connections; we read this as shared-kernel convolutions with downsampling and concatenated the same-scale maps from the three branches, which keeps the views aligned at each scale.</p>
+<p>Each corrected view is then encoded at three scales. The same 3 × 3 convolution is applied three times with 2 × 2 max pooling in between, giving feature maps at full, half and quarter resolution. The paper's figure shows three convolution paths joined by unspecified dense connections. We read this as shared-kernel convolutions with downsampling and concatenated the same-scale maps from the three branches, which keeps the views aligned at each scale.</p>
 <p>Each scale passes through a pixel-weighted channel attention module (PCAM), which reweights features in two ways:</p>
 <ul>
 <li><b>Pixel attention.</b> A 3 × 3 convolution is gated element-wise by the sigmoid of a 1 × 1 convolution, so every spatial position receives its own weight.</li>
@@ -96,7 +96,7 @@
 
 <h2>Loss and training</h2>
 <p>The loss combines an L1 pixel loss with a perceptual loss. For the perceptual term, the output and the reference both pass through an ImageNet-pretrained VGG-16, and the absolute differences between their activations are summed over its convolutional layers and added to the L1 term with a weight of 0.05. Comparing intermediate activations captures differences in texture, colour and structure that a pixel loss misses.</p>
-<p>The model was optimised with Adam at a batch size of one for 200 epochs, as the paper proposes, on a single NVIDIA P100 GPU (about 12 hours). Loss on the held-out split was evaluated every 150 training images, and the weights with the lowest loss were kept; the model converged at epoch 89.</p>
+<p>The model was optimised with Adam at a batch size of one for 200 epochs, as the paper proposes, on a single NVIDIA P100 GPU (about 12 hours). Loss on the held-out split was evaluated every 150 training images, and the weights with the lowest loss were kept. The model converged at epoch 89.</p>
 
 <h2>Evaluation</h2>
 <p>We evaluated with the paper's five metrics, which together cover fidelity to the reference and perceptual quality without one:</p>
@@ -115,9 +115,9 @@
 
 <h2>Key takeaways</h2>
 <ul>
-<li>A method can be rebuilt from a paper's description alone: the enhanced images came out visually close to the references.</li>
-<li>Structure was preserved consistently (SSIM in a narrow range), while PSNR varied more between images.</li>
-<li>The scores were lower than reported in the paper, which shows how much a reproduction depends on details that papers leave unstated, and why publishing code matters.</li>
+<li>Reproducing a method without public code requires decisions on details that the paper leaves unspecified, and these decisions should be documented.</li>
+<li>The reproduction was visually close to the references but did not reach the scores reported in the paper.</li>
+<li>Per-image metric distributions were more informative than mean scores alone.</li>
 </ul>
 
   </article>

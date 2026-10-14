@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -45,7 +45,7 @@
     <figure class="p-figure"><img src="/img/ar_thumb.jpg" width="1400" height="875" alt="The five effects drawn by the demo: wind, earth, lightning, ice and fire, with the gesture for each"></figure>
     <div class="demo" data-src="/demos/ar-gestures/">
       <div class="demo-start">
-        <p><b>Try it live.</b> The demo uses your webcam; the video is processed in your browser and never leaves your device.</p>
+        <p><b>Try it live.</b> The demo uses your webcam. The video is processed in your browser and never leaves your device.</p>
         <div class="actions"><button type="button" class="btn primary small demo-btn">Start demo</button><a class="btn ghost small" href="/demos/ar-gestures/">Open full screen ↗</a></div>
       </div>
     </div>
@@ -54,10 +54,10 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>A browser-based augmented reality demo, <strong>built by me</strong>, that recognises five hand gestures from the webcam and renders a matching particle effect that follows the hand.</li><li><strong>MediaPipe Hands</strong> provides 21 hand landmarks per frame, geometric rules classify the gesture, and a five-frame majority vote with a 300 ms hold suppresses flicker.</li><li>Each effect is a separate particle system on a Canvas 2D overlay (emission with damping, orbital motion, recursive midpoint displacement, gravity, procedural snowflakes), anchored to the palm and scaled by hand size so it stays consistent at any distance from the camera.</li><li>It runs in <strong>real time in plain JavaScript</strong> with no build step, using a frame-rate independent update with a capped time step.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>A browser-based augmented reality demo that recognises five hand gestures from the webcam and renders a matching particle effect that follows the hand.</li><li><strong>MediaPipe Hands</strong> provides 21 hand landmarks per frame, geometric rules classify the gesture, and a five-frame majority vote with a 300 ms hold suppresses flicker.</li><li>Each effect is a separate particle system on a Canvas 2D overlay (emission with damping, orbital motion, recursive midpoint displacement, gravity, procedural snowflakes), anchored to the palm and scaled by hand size so it stays consistent at any distance from the camera.</li><li>It runs in <strong>real time in plain JavaScript</strong> with no build step, using a frame-rate independent update with a capped time step.</li></ul></div>
 
 <h2>Overview</h2>
-<p>A browser-based augmented reality demo driven by the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time, a rule-based recogniser classifies the gesture from their geometry, and a particle effect is rendered on a canvas overlay that follows the hand. It is written in plain JavaScript with Canvas 2D rendering and no build step.</p>
+<p>A browser-based augmented reality demo driven by the webcam. MediaPipe Hands tracks 21 landmarks on one hand in real time, a rule-based recogniser classifies the gesture from their geometry, and a particle effect is rendered on a canvas overlay that follows the hand. It is written in plain JavaScript with Canvas 2D rendering.</p>
 <div class="table-wrap"><table>
 <tr><th>Gesture</th><th>Effect</th></tr>
 <tr><td>Open palm</td><td>Wind: particles orbiting the palm on three elliptical rings</td></tr>
@@ -82,11 +82,11 @@
 <p>A pinch is detected from the Euclidean distance between the thumb tip and the index tip, with a threshold of 0.06 in normalised units. It is checked first because it is defined by the thumb and index alone, independent of the other fingers: during a pinch the remaining fingers may be raised or folded, and the finger-count rules, which ignore the thumb, would otherwise read the same hand as an open palm, a fist or no gesture.</p>
 <h3>Temporal smoothing</h3>
 <p>Per-frame labels flicker when a finger sits close to its threshold or a landmark jitters. Two filters stabilise them. First, the label is a majority vote over the last five frames, which removes isolated misclassifications. Second, a smoothed label must hold for 300 ms before its effect starts, and the hold timer restarts whenever the smoothed label changes. Once started, an effect persists until a different gesture is held, so a brief loss of the gesture does not switch it off.</p>
-<p>The trade-off is latency against stability. The vote lags a real change by a few frames and the hold adds 300 ms, so a new effect starts a moment after the hand changes shape; in return, transitional hand shapes between two gestures do not trigger effects in passing.</p>
+<p>The trade-off is latency against stability. The vote lags a real change by a few frames and the hold adds 300 ms, so a new effect starts a moment after the hand changes shape. In return, transitional hand shapes between two gestures do not trigger effects in passing.</p>
 
 <h2>Rendering</h2>
 <h3>Palm anchoring and scale invariance</h3>
-<p>Effects are anchored to the palm centre, computed as the mean of the wrist and the four finger bases; lightning alone is anchored to the index fingertip. The scale is the distance from the wrist to the base of the middle finger in canvas pixels, with a lower bound. Sizes, speeds, emission spread and orbit radii in every effect are expressed as multiples of this scale, so an effect looks the same whether the hand is close to the camera or far away.</p>
+<p>Effects are anchored to the palm centre, computed as the mean of the wrist and the four finger bases. Lightning alone is anchored to the index fingertip. The scale is the distance from the wrist to the base of the middle finger in canvas pixels, with a lower bound. Sizes, speeds, emission spread and orbit radii in every effect are expressed as multiples of this scale, so an effect looks the same whether the hand is close to the camera or far away.</p>
 <h3>Particle systems</h3>
 <p>Each element is its own particle system with an update step that advances the state by the elapsed time and a draw step that renders it around the current anchor.</p>
 <ul>

@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>My BSc thesis at Leiden University classifies microscope Z-stacks of nettle-family pollen into three classes (Parietaria, Urtica dioica/urens and Urtica membranacea) using every focal plane of the stack.</li><li>The stacks are standardised to 20 frames of 224 × 224 pixels and classified with <strong>3D convolutional networks in PyTorch</strong>: a small baseline 3D CNN and a ResNet3D (r3d_18) trained with cross-entropy and AdamW.</li><li>On about 600 stacks, a ResNet3D trained on the whole stack reached <strong>95 percent test accuracy and a weighted F1 of 0.949</strong>, ahead of the baseline and of models trained on subsections of the stack.</li><li>Experiments on learning rate, augmentation, batch size, stack depth and <strong>transfer learning from video</strong> showed that the outer focal planes carry useful information and that video pretraining did not help.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>My BSc thesis at Leiden University classifies microscope Z-stacks of nettle-family pollen into three classes (Parietaria, Urtica dioica/urens and Urtica membranacea) using every focal plane of the stack.</li><li>The stacks are standardised to 20 frames of 224 × 224 pixels and classified with <strong>3D convolutional networks in PyTorch</strong>: a small baseline 3D CNN and a ResNet3D (r3d_18) trained with cross-entropy and AdamW.</li><li>On about 600 stacks, a ResNet3D trained on the whole stack reached <strong>95 percent test accuracy and a weighted F1 of 0.949</strong>, ahead of the baseline and of models trained on subsections of the stack.</li><li>Experiments on learning rate, augmentation, batch size, stack depth and <strong>transfer learning from video</strong> showed that the outer focal planes carry useful information and that video pretraining did not help.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Telling the pollen of Parietaria and Urtica, two genera of the nettle family (Urticaceae), apart under the microscope is hard because the grains look very similar. A microscope captures each grain as a Z-stack: a series of images at different focal depths, each with a different part of the grain in focus. Earlier work classified these grains from 2D projections of the stack, which compress the depth information into a single image.</p>
@@ -109,14 +109,11 @@
 <h3>Transfer learning</h3>
 <p>Initialising ResNet3D from weights pretrained on video was tested as a way to compensate for the small dataset. It did not improve test accuracy, so the final model was trained from scratch.</p>
 
-<h2>Conclusion</h2>
-<p>A ResNet3D trained from scratch on the whole stack reached 95 percent test accuracy and a weighted F1 of 0.949 across the three classes, and using every focal plane gave better and more stable results than using only the central ones.</p>
-
 <h2>Key takeaways</h2>
 <ul>
-<li>Using every focal plane of the stack pays off: the ResNet3D trained on the whole Z-stack reached 95% test accuracy, ahead of the baseline and of models trained on parts of the stack.</li>
-<li>The outer focal planes carry useful information, so cropping the stack to its sharpest frames loses signal.</li>
-<li>Pretraining on video did not help, which suggests that transfer learning works best when the source domain resembles the target.</li>
+<li>The outer focal planes contribute information that the central planes lack, so classification benefits from the complete stack.</li>
+<li>A deeper 3D architecture (ResNet3D) outperformed a shallow baseline despite a dataset of only about 600 samples.</li>
+<li>Pretraining on video did not transfer to microscope stacks in this setting.</li>
 </ul>
 <p>The project builds on <a href="https://doi.org/10.1016/j.neucom.2022.11.042">Analysis of automatic image classification methods for Urticaceae pollen classification</a> (Li et al., 2023).</p>
 

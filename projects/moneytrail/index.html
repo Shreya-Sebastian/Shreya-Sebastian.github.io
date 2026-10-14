@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
+<link rel="stylesheet" href="/assets/style.css?v=48b093ac">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">TL;DR</p><ul><li>Moneytrail is a local Python tool that imports CSV exports from four Dutch banks into <strong>DuckDB</strong> and reports who you pay and which payments repeat.</li><li>Merchants are resolved by rule-based name normalisation and <strong>union-find clustering</strong> on shared IBANs and string similarity, and recurring payments are found by fitting amount bands to five billing schedules with tolerance-based gap tests.</li><li>Evaluation uses labelled synthetic transactions in all four bank formats, with a held-out set written separately from the rules, scored with B-cubed F1 and series-level precision and recall.</li><li>On the held-out set merchant grouping reaches a <strong>B-cubed F1 of 0.952 to 0.961</strong> and recurring series are found with a <strong>recall of 0.944</strong>.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>Moneytrail is a local Python tool that imports CSV exports from four Dutch banks into <strong>DuckDB</strong> and reports who you pay and which payments repeat.</li><li>Merchants are resolved by rule-based name normalisation and <strong>union-find clustering</strong> on shared IBANs and string similarity, and recurring payments are found by fitting amount bands to five billing schedules with tolerance-based gap tests.</li><li>Evaluation uses labelled synthetic transactions in all four bank formats, with a held-out set written separately from the rules, scored with B-cubed F1 and series-level precision and recall.</li><li>On the held-out set merchant grouping reaches a <strong>B-cubed F1 of 0.952 to 0.961</strong> and recurring series are found with a <strong>recall of 0.944</strong>.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally on DuckDB, so the data never leaves the machine and no connection to a bank account is needed. The core problems are entity resolution (working out who a payment went to) and periodicity detection, both measured against labelled synthetic data.</p>
@@ -96,14 +96,14 @@
 <p>When a band does not fit any schedule, each exact amount is tested separately, which recovers a fixed fee hidden among one-off purchases at the same merchant. Series picked out this way need at least three payments: a single pair of payments a year apart counts as a yearly renewal only when nothing else from that merchant is in the data, since two equal receipts at a supermarket are a coincidence.</p>
 
 <h3>Price changes and stopped payments</h3>
-<p>Amounts within 3% are treated as one price when deciding whether a series is coherent, while price changes are detected on exact amounts, because fixed charges repeat to the cent and a rent increase can be as small as 3%. A new amount counts as a price change when it repeats or is the latest charge; a single deviating amount in the middle, such as a correction or a prorated month, is ignored. A series is marked as stopped when the last payment is overdue by more than half a period, and active series get a predicted next payment date.</p>
+<p>Amounts within 3% are treated as one price when deciding whether a series is coherent, while price changes are detected on exact amounts, because fixed charges repeat to the cent and a rent increase can be as small as 3%. A new amount counts as a price change when it repeats or is the latest charge. A single deviating amount in the middle, such as a correction or a prorated month, is ignored. A series is marked as stopped when the last payment is overdue by more than half a period, and active series get a predicted next payment date.</p>
 
 <h2>Evaluation</h2>
 <h3>Synthetic ground truth</h3>
 <p>A generator produces 18 months of synthetic transactions for a persona with ground-truth labels, and writes the same history in all four banks' formats, so the importers are exercised as well as the matching rules. Collections and transfers are moved off weekends, as in real statements. There are two sets: a development set written alongside the rules, and a held-out set written separately, without access to the matching code, for a different persona with different shops and additional kinds of noise: several shops paid through one payment provider's account, unrelated businesses with near-identical names, branch numbers attached to shop names and more truncation widths. The held-out set is used only for reporting and is replaced once the rules are changed in response to it.</p>
 
 <h3>Metrics</h3>
-<p>Grouping is scored with B-cubed F1, which credits each transaction for how well its predicted cluster matches its true cluster. Naming is scored separately as the share of transactions given the right merchant name. A detected recurring series counts as correct when at least 80% of its transactions belong to one true series and it covers at least 80% of that series, which gives series-level precision and recall; price changes and cancellations are scored as recall over the labelled events. Results are over 6 random seeds and 4 bank formats, about 1,050 transactions per file.</p>
+<p>Grouping is scored with B-cubed F1, which credits each transaction for how well its predicted cluster matches its true cluster. Naming is scored separately as the share of transactions given the right merchant name. A detected recurring series counts as correct when at least 80% of its transactions belong to one true series and it covers at least 80% of that series, which gives series-level precision and recall. Price changes and cancellations are scored as recall over the labelled events. Results are over 6 random seeds and 4 bank formats, about 1,050 transactions per file.</p>
 <div class="table-wrap"><table>
 <tr><th></th><th>Development</th><th>Held-out</th></tr>
 <tr><td>Merchant grouping (B-cubed F1)</td><td>1.000</td><td>0.952 to 0.961</td></tr>
