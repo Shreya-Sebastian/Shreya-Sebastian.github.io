@@ -17,11 +17,13 @@
 <link rel="canonical" href="https://shreya-sebastian.github.io/projects/retrostc-net/">
 <meta property="og:url" content="https://shreya-sebastian.github.io/projects/retrostc-net/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=d81f0b37">
+<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -116,14 +118,12 @@
 </table></div>
 <p>STC alone does not measurably reduce forgetting, since consolidated weights are not protected from later learning. Using the consolidation log as importance reaches EWC level, with importance selected by surprising events after learning rather than fixed during it. It does not reach Synaptic Intelligence.</p>
 
-<h2>Limitations</h2>
+<h2>Key takeaways</h2>
 <ul>
-<li>Small MLPs on MNIST only; the results demonstrate the mechanism, not performance at scale.</li>
-<li>Time is measured in training steps, and time constants were set by hand.</li>
-<li>The deletion test resets weights without retraining.</li>
-<li>The surprise detector also reacts to loss noise, catching a task change within 20 steps in at most 3 of 4 cases.</li>
-<li>Settings with delayed labels are not tested.</li>
-<li>The biological mapping is simplified.</li>
+<li>Synaptic tagging and capture can work inside gradient training: an event close to the end of learning kept 91% of a task, holding accuracy at about 0.95 instead of 0.61.</li>
+<li>A later task can rescue an earlier one retroactively, as the behavioural-tagging literature predicts.</li>
+<li>The consolidation log is a faithful explanation of what the network retains, separating two memories more clearly than Fisher importance in a deletion test.</li>
+<li>Used as importance on Split-MNIST, the log reaches EWC level (0.636 against 0.637), with importance decided by events after learning rather than fixed during it.</li>
 </ul>
 
   </article>
