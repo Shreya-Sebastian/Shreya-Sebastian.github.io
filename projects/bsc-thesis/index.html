@@ -17,11 +17,13 @@
 <link rel="canonical" href="https://shreya-sebastian.github.io/projects/bsc-thesis/">
 <meta property="og:url" content="https://shreya-sebastian.github.io/projects/bsc-thesis/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=d81f0b37">
+<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -110,10 +112,11 @@
 <h2>Conclusion</h2>
 <p>A ResNet3D trained from scratch on the whole stack reached 95 percent test accuracy and a weighted F1 of 0.949 across the three classes, and using every focal plane gave better and more stable results than using only the central ones.</p>
 
-<h2>Limitations</h2>
+<h2>Key takeaways</h2>
 <ul>
-<li>The scores come from a single train and test split; k-fold cross-validation would give a more reliable estimate.</li>
-<li>3D networks are large relative to a dataset of this size; a larger dataset is the natural next step.</li>
+<li>Using every focal plane of the stack pays off: the ResNet3D trained on the whole Z-stack reached 95% test accuracy, ahead of the baseline and of models trained on parts of the stack.</li>
+<li>The outer focal planes carry useful information, so cropping the stack to its sharpest frames loses signal.</li>
+<li>Pretraining on video did not help, which suggests that transfer learning works best when the source domain resembles the target.</li>
 </ul>
 <p>The project builds on <a href="https://doi.org/10.1016/j.neucom.2022.11.042">Analysis of automatic image classification methods for Urticaceae pollen classification</a> (Li et al., 2023).</p>
 

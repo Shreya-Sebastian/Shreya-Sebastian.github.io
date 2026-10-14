@@ -17,11 +17,13 @@
 <link rel="canonical" href="https://shreya-sebastian.github.io/projects/deep-learning-reproduction/">
 <meta property="og:url" content="https://shreya-sebastian.github.io/projects/deep-learning-reproduction/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=d81f0b37">
+<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -111,11 +113,11 @@
 <figure><img src="/img/dl_repro_output.png" width="794" height="247" alt="Diver image: raw input, reference and model output" loading="lazy"><figcaption>Raw input, reference and our model's output.</figcaption></figure>
 <p>The enhanced images come out visually close to the references. SSIM was concentrated in a narrow range, indicating that structure is preserved consistently across images, while PSNR varied more between images, with most of its mass at the higher values. PSNR and SSIM were lower than reported in the paper, and the other three metrics did not line up with the paper's values.</p>
 
-<h2>Limitations</h2>
+<h2>Key takeaways</h2>
 <ul>
-<li>The evaluation uses a single dataset; a second underwater benchmark would test how well the model generalises across water types and scenes.</li>
-<li>Checkpoints were selected on the held-out split, as there was no separate validation set.</li>
-<li>Several architectural details are our interpretation of the paper's description, so the network is a reproduction of the method rather than of the authors' exact implementation.</li>
+<li>A method can be rebuilt from a paper's description alone: the enhanced images came out visually close to the references.</li>
+<li>Structure was preserved consistently (SSIM in a narrow range), while PSNR varied more between images.</li>
+<li>The scores were lower than reported in the paper, which shows how much a reproduction depends on details that papers leave unstated, and why publishing code matters.</li>
 </ul>
 
   </article>

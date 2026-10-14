@@ -17,11 +17,13 @@
 <link rel="canonical" href="https://shreya-sebastian.github.io/projects/llm-annotation-panel/">
 <meta property="og:url" content="https://shreya-sebastian.github.io/projects/llm-annotation-panel/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
-<link rel="stylesheet" href="/assets/style.css?v=d81f0b37">
+<link rel="stylesheet" href="/assets/style.css?v=4c65de30">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -52,6 +54,7 @@
 <h2>Overview</h2>
 <p>Annotating creative thinking in conversations is slow and subjective work for people. This project tests whether a panel of large language models can do it consistently, and whether the models agree more when each one can see how the others annotated before, in the spirit of a panel of experts that calibrates over time.</p>
 <p>The panel has three members: Llama 3.3 70B (served through Groq), GPT-4.1 and Gemini 2.5 Pro, each accessed through its provider's API. The research question is narrow: does showing a model its peers' earlier annotations as in-context examples change how much the panel agrees, compared with the same models annotating the same text alone?</p>
+<p>We worked on it as a team: other members built the model interfaces, the preprocessing, the agreement metric, the plots and the statistical analysis. My part was the experiment loop, which runs the panel over the iterations and both conditions and routes the peer annotations between models, including running both conditions on the same transcript in every iteration. I also wrote most of the prompts.</p>
 
 <h2>Data and codebook</h2>
 <p>The data are 232 meeting transcripts from the QMSum dataset, covering academic, committee and product meetings. Speech-recognition markup such as vocal-sound and disfluency tags is removed, spelled-out acronyms are joined back together, and each meeting is truncated to its first 100 speaker turns, written as one <code>speaker: text</code> line per turn.</p>
@@ -101,15 +104,12 @@
 </table></div>
 <p>Seeing their peers' annotations made the models agree more (paired t-test, t(38) = 4.20, p &lt; 0.001), and the gain held in four of the five runs. Agreement showed no trend over the iterations in either condition, so the effect comes from the examples in the prompt rather than from a gradual drift.</p>
 
-<h2>Limitations</h2>
+<h2>Key takeaways</h2>
 <ul>
-<li>Agreement is not accuracy: a panel can converge on the same wrong label. An automated annotator like this needs a small human-verified set to calibrate against before it is used at scale.</li>
-<li>Passages that the models did not copy verbatim are excluded from scoring, so agreement is measured on the annotations that could be located.</li>
-<li>The study covers one dataset of meeting transcripts and one codebook.</li>
+<li>Showing each model its peers' earlier annotations as examples raised agreement from 0.185 to 0.216, and the gain came from the examples in the prompt rather than a drift over time.</li>
+<li>Asking for verbatim passages instead of paraphrases makes LLM output machine-checkable, since every annotation can be located in the source text.</li>
+<li>Agreement is not accuracy: a panel can converge on the same wrong label, so an automated annotator needs a small human-verified set before it is used at scale.</li>
 </ul>
-
-<h2>My part</h2>
-<p>I wrote the experiment loop that runs the panel over the iterations and both conditions and routes the peer annotations between models, including running both conditions on the same transcript in every iteration, and wrote most of the prompts. Other team members built the model interfaces, preprocessing, the agreement metric, the plots and the statistical analysis.</p>
 
   </article>
   <aside class="p-side">
