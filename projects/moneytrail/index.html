@@ -49,7 +49,7 @@
 <div class="container p-layout">
   <article class="prose">
 
-<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>Moneytrail is a local Python tool that imports CSV exports from four Dutch banks into <strong>DuckDB</strong> and reports who you pay and which payments repeat.</li><li>Merchants are resolved by rule-based name normalisation and <strong>union-find clustering</strong> on shared IBANs and string similarity, and recurring payments are found by fitting amount bands to five billing schedules with tolerance-based gap tests.</li><li>Evaluation uses labelled synthetic transactions in all four bank formats, with a held-out set written separately from the rules, scored with B-cubed F1 and series-level precision and recall.</li><li>On the held-out set merchant grouping reaches a <strong>B-cubed F1 of 0.952 to 0.961</strong> and recurring series are found with a <strong>recall of 0.944</strong>.</li></ul></div>
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>Moneytrail is a local Python tool that imports CSV exports from four Dutch banks into <strong>DuckDB</strong> and reports who you pay and which payments repeat.</li><li>Merchants are resolved by rule-based name normalisation and <strong>union-find clustering</strong> on shared IBANs and string similarity, and recurring payments are found by fitting amount bands to five billing schedules with tolerance-based gap tests.</li><li>Evaluation uses labelled synthetic transactions in all four bank formats, with a held-out set written separately from the rules, scored with B-cubed F1 and series-level precision and recall.</li><li>Shops that appear only under a legal entity name go to a <strong>tool-calling agent</strong> on a local model, which named 3 of 4 such cases on the held-out set.</li><li>On the held-out set merchant grouping reaches a <strong>B-cubed F1 of 0.952 to 0.961</strong> and recurring series are found with a <strong>recall of 0.944</strong>.</li></ul></div>
 
 <h2>Overview</h2>
 <p>Moneytrail reads the CSV exports from four Dutch banks and reports who you pay and which payments repeat. It runs locally on DuckDB, so the data never leaves the machine and no connection to a bank account is needed. The core problems are entity resolution (working out who a payment went to) and periodicity detection, both measured against labelled synthetic data.</p>
@@ -117,14 +117,18 @@
 <ul>
 <li><b>Wrong merges</b> come mainly from payment-provider IBANs shared by unrelated shops, where a shared IBAN is not evidence of one merchant.</li>
 <li><b>Missed merges</b> come from branch numbers attached to shop names, which remove the whole word as a digit token, and from Dutch abbreviations and spacing variants.</li>
-<li><b>Naming misses</b> include shops that appear only under a holding company's legal name, which rules cannot map to a trading name and which are left unnamed by design.</li>
+<li><b>Naming misses</b> include shops that appear only under a holding company's legal name, which rules cannot map to a trading name. These go to the merchant investigator described below.</li>
 <li><b>The one missed recurring series</b> is a yearly payment that occurs only once in the 18 months.</li>
 </ul>
 <p>These point to the next refinements of the resolution rules: treating IBANs of known payment providers as weak evidence, splitting branch numbers off attached names and normalising Dutch abbreviations, followed by measurement on a new held-out set.</p>
 
+<h3>Merchant investigator</h3>
+<p>Some shops appear only under a legal entity name, such as a cafe run by a holding company. These merchants go to a small agent that runs on a local model (qwen3:8b through Ollama), so no transaction data leaves the machine. It can query the merchant's payment history, search the rest of the account, and search a company register and a map, both simulated for the synthetic personas. A name is accepted only if it appears in a tool result or in the statements, and the agent may answer "unknown".</p>
+<p>On the held-out set the agent named <strong>3 of 4 hard cases</strong>, against none for the rules and none for the same model without tools, and it did not change any name the rules already had right. These are small numbers from one simulated world.</p>
+
   </article>
   <aside class="p-side">
-    <dl><div><dt>Type</dt><dd>Personal project, 2026</dd></div><div><dt>Stack</dt><dd>Python, DuckDB, RapidFuzz, pytest</dd></div></dl>
+    <dl><div><dt>Type</dt><dd>Personal project, 2026</dd></div><div><dt>Stack</dt><dd>Python, DuckDB, RapidFuzz, Ollama, pytest</dd></div></dl>
     <div class="actions"><a class="btn primary small" href="https://github.com/Shreya-Sebastian/Moneytrail">Code ↗</a></div>
   </aside>
 </div>
