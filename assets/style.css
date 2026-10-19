@@ -15,6 +15,8 @@
   --navy: #08142e;
   --navy-surface: #102049;
   --navy-line: #1d2f5c;
+  --band-bg: #f3f5fb; --band-surface: #ffffff; --band-fg: #0a1530; --band-muted: #55627a;
+  --band-line: #dde3ee; --band-accent: #5426b0; --band-accent-soft: #ece6fa;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "Manrope", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
@@ -26,6 +28,8 @@
     --line: #1a2747; --accent: #b8a2ff; --accent-fill: #6a3fd4; --accent-soft: #231d4a; --code-bg: #0c1630;
     --navy: #0b1a3c; --navy-surface: #132551; --navy-line: #21366a; color-scheme: dark;
     --card-bg: var(--surface); --card-line: var(--line); --card-shadow: none;
+    --band-bg: var(--navy); --band-surface: var(--navy-surface); --band-fg: #ffffff; --band-muted: #b4bfd4;
+    --band-line: var(--navy-line); --band-accent: #a58cf5; --band-accent-soft: #2a2f5e;
   }
 }
 :root[data-theme="dark"] {
@@ -33,11 +37,13 @@
     --line: #1a2747; --accent: #b8a2ff; --accent-fill: #6a3fd4; --accent-soft: #231d4a; --code-bg: #0c1630;
     --navy: #0b1a3c; --navy-surface: #132551; --navy-line: #21366a; color-scheme: dark;
     --card-bg: var(--surface); --card-line: var(--line); --card-shadow: none;
+    --band-bg: var(--navy); --band-surface: var(--navy-surface); --band-fg: #ffffff; --band-muted: #b4bfd4;
+    --band-line: var(--navy-line); --band-accent: #a58cf5; --band-accent-soft: #2a2f5e;
 }
-/* dark navy bands: nav, page headers, closing band, footer */
+/* bands: nav, page headers, closing band, footer (pale in light mode, navy in dark mode) */
 .nav, .hero, .page-head, .p-hero, .band, footer {
-  --bg: var(--navy); --surface: var(--navy-surface); --fg: #ffffff; --muted: #b4bfd4;
-  --line: var(--navy-line); --accent: #a58cf5; --accent-soft: #2a2f5e; --code-bg: var(--navy-surface);
+  --bg: var(--band-bg); --surface: var(--band-surface); --fg: var(--band-fg); --muted: var(--band-muted);
+  --line: var(--band-line); --accent: var(--band-accent); --accent-soft: var(--band-accent-soft); --code-bg: var(--band-surface);
   background: var(--bg); color: var(--fg);
 }
 
