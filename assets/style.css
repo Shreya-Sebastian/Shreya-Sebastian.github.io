@@ -108,7 +108,8 @@ section.block { padding-block: 64px; border-top: 1px solid var(--line); }
 /* about */
 .about { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 56px; }
 .about p { margin: 0 0 16px; max-width: 62ch; }
-.facts { display: grid; gap: 28px; align-content: start; }
+.facts { display: grid; gap: 16px; align-content: start; }
+.facts > div { border: 1px solid var(--card-line); border-radius: 12px; padding: 18px 20px; background: var(--bg); }
 .label { font-family: var(--mono); font-weight: 400; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0 0 12px; }
 .edu { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .edu li { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 12px; }
@@ -116,7 +117,7 @@ section.block { padding-block: 64px; border-top: 1px solid var(--line); }
 .edu b { font-weight: 600; }
 .edu small { display: block; color: var(--muted); font-size: 0.88rem; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
-.chips li { border: 1px solid var(--line); background: var(--surface); padding: 4px 12px; border-radius: 8px; font-size: 0.88rem; }
+.chips li { border: 1px solid var(--card-line); background: var(--surface); padding: 4px 12px; border-radius: 8px; font-size: 0.88rem; }
 
 /* cards */
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
