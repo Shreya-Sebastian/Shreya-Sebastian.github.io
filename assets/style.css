@@ -15,8 +15,8 @@
   --navy: #08142e;
   --navy-surface: #102049;
   --navy-line: #1d2f5c;
-  --band-bg: #f3f5fb; --band-surface: #ffffff; --band-fg: #0a1530; --band-muted: #55627a;
-  --band-line: #dde3ee; --band-accent: #5426b0; --band-accent-soft: #ece6fa;
+  --band-bg: #e7ebf4; --band-surface: #ffffff; --band-fg: #0a1530; --band-muted: #55627a;
+  --band-line: #d2d9e7; --band-accent: #5426b0; --band-accent-soft: #ece6fa;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "Manrope", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
