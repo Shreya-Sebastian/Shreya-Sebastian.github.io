@@ -42,7 +42,7 @@
     <h1>Retail purchase prediction</h1>
     <p class="summary">A Spark pipeline on real online-retail transactions that segments customers and predicts who will buy in a given category, evaluated honestly on future months rather than a random split.</p>
 
-    <figure class="p-figure fig"><img src="/img/retail_propensity_ap.svg" width="720" height="430" alt="Bar chart of average precision on held-out months for a single category: a baseline model reaches 0.50 and gradient-boosted trees reach 0.69."></figure>
+    <figure class="p-figure fig"><img src="/img/retail_lift_top10.svg" width="720" height="410" alt="Grouped bar chart of lift in the top 10% of ranked customers, for three targets, the order-count rule against boosted trees. Any purchase 1.84 then 1.93, kitchen 1.94 then 2.17, bags 2.28 then 3.03, where random targeting is 1.0."><figcaption>Targeting the top-ranked tenth of customers finds up to three times as many buyers as random, most of all for the rarest category.</figcaption></figure>
 
   </div>
 </header>

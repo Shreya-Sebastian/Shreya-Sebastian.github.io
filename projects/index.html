@@ -95,11 +95,11 @@
   </div>
 </article>
 <article class="card" data-kind="ml">
-  <div class="thumb fig"><img src="/img/retail_propensity_ap.svg" width="720" height="430" alt="Bar chart: average precision on held-out months rises from 0.50 for the baseline to 0.69 for gradient-boosted trees" loading="lazy"></div>
+  <div class="thumb fig"><img src="/img/retail_lift_top10.svg" width="720" height="410" alt="Grouped bar chart: lift in the top 10% of ranked customers, order-count rule against boosted trees, for any purchase, kitchen and bags, reaching 3.03 times random for bags" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Personal project</span>
     <h3><a href="/projects/retail-prediction/">Retail purchase prediction</a></h3>
-    <p>A PySpark pipeline on real retail transactions that segments customers with k-means and predicts purchase propensity per category. Evaluated on future months with a rolling time split, where gradient-boosted trees raised a category's average precision from <strong>0.50 to 0.69</strong>.</p>
+    <p>A PySpark pipeline on real retail transactions that segments customers with k-means and predicts purchase propensity per category. Evaluated on future months with a rolling time split, where boosted trees find up to <strong>3&#215; as many buyers as random</strong> in the top-ranked tenth.</p>
     <ul class="tags"><li>PySpark</li><li>Databricks</li><li>MLflow</li><li>scikit-learn</li><li>Terraform</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 410" role="img" aria-label="Grouped bar chart of lift in the top 10% of ranked customers, for three targets, order-count rule against boosted trees. Any purchase: 1.84 and 1.93. Kitchen: 1.94 and 2.17. Bags: 2.28 and 3.03. Random targeting is 1.0.">
+  <defs>
+    <style>
+      text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      .title { font-size:19px; font-weight:700; fill:#0a1530; }
+      .sub { font-size:13px; fill:#55627a; }
+      .legtxt { font-size:12.5px; fill:#3a4660; }
+      .axis { stroke:#c3cbdb; stroke-width:1.5; }
+      .grid { stroke:#e7ebf4; stroke-width:1; }
+      .ref { stroke:#7a6aa6; stroke-width:1.5; stroke-dasharray:5 4; }
+      .tick { font-size:12.5px; fill:#55627a; }
+      .cat { font-size:14.5px; font-weight:600; fill:#0a1530; }
+      .brate { font-size:11.5px; fill:#8a94a8; }
+      .val { font-size:14px; font-weight:700; }
+      .refL { font-size:12px; fill:#7a6aa6; font-weight:600; }
+      .bRule { fill:#aab3c7; }
+      .bTree { fill:#5426b0; }
+      .vRule { fill:#5b6b86; }
+      .vTree { fill:#5426b0; }
+    </style>
+  </defs>
+
+  <text class="title" x="60" y="30">Lift in the top 10% of ranked customers</text>
+  <text class="sub" x="60" y="50">Purchase rate in the top-scored tenth, relative to the overall rate (random = 1.0&#215;). Test month.</text>
+
+  <!-- legend -->
+  <rect class="bRule" x="60" y="64" width="14" height="14" rx="2"/>
+  <text class="legtxt" x="80" y="75">Order-count rule</text>
+  <rect class="bTree" x="235" y="64" width="14" height="14" rx="2"/>
+  <text class="legtxt" x="255" y="75">Boosted trees (chosen model)</text>
+
+  <!-- gridlines + y ticks (0 to 3, in multiples of the base rate) -->
+  <g>
+    <line class="grid" x1="90" y1="197.5" x2="680" y2="197.5"/>
+    <line class="grid" x1="90" y1="116.25" x2="680" y2="116.25"/>
+    <text class="tick" x="80" y="364" text-anchor="end">0&#215;</text>
+    <text class="tick" x="80" y="282.75" text-anchor="end">1&#215;</text>
+    <text class="tick" x="80" y="201.5" text-anchor="end">2&#215;</text>
+    <text class="tick" x="80" y="120.25" text-anchor="end">3&#215;</text>
+  </g>
+
+  <!-- axes -->
+  <line class="axis" x1="90" y1="100" x2="90" y2="360"/>
+  <line class="axis" x1="90" y1="360" x2="680" y2="360"/>
+
+  <!-- random reference line at 1.0x -->
+  <line class="ref" x1="90" y1="278.75" x2="680" y2="278.75"/>
+  <text class="refL" x="286.5" y="273" text-anchor="middle">random</text>
+
+  <!-- Any purchase -->
+  <rect class="bRule" x="126.3" y="210.5" width="55" height="149.5" rx="2"/>
+  <rect class="bTree" x="195.3" y="203.2" width="55" height="156.8" rx="2"/>
+  <text class="val vRule" x="153.8" y="202.5" text-anchor="middle">1.84&#215;</text>
+  <text class="val vTree" x="222.8" y="195.2" text-anchor="middle">1.93&#215;</text>
+  <text class="cat" x="188.3" y="382" text-anchor="middle">Any purchase</text>
+  <text class="brate" x="188.3" y="398" text-anchor="middle">base rate 50%</text>
+
+  <!-- Kitchen -->
+  <rect class="bRule" x="323" y="202.4" width="55" height="157.6" rx="2"/>
+  <rect class="bTree" x="392" y="183.7" width="55" height="176.3" rx="2"/>
+  <text class="val vRule" x="350.5" y="194.4" text-anchor="middle">1.94&#215;</text>
+  <text class="val vTree" x="419.5" y="175.7" text-anchor="middle">2.17&#215;</text>
+  <text class="cat" x="385" y="382" text-anchor="middle">Kitchen</text>
+  <text class="brate" x="385" y="398" text-anchor="middle">base rate 43%</text>
+
+  <!-- Bags -->
+  <rect class="bRule" x="519.7" y="174.8" width="55" height="185.2" rx="2"/>
+  <rect class="bTree" x="588.7" y="113.8" width="55" height="246.2" rx="2"/>
+  <text class="val vRule" x="547.2" y="166.8" text-anchor="middle">2.28&#215;</text>
+  <text class="val vTree" x="616.2" y="105.8" text-anchor="middle">3.03&#215;</text>
+  <text class="cat" x="581.7" y="382" text-anchor="middle">Bags</text>
+  <text class="brate" x="581.7" y="398" text-anchor="middle">base rate 28%</text>
+</svg>
