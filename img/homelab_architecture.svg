@@ -18,6 +18,9 @@
     </style>
   </defs>
 
+  <!-- light background panel so the diagram reads the same in light and dark mode -->
+  <rect x="0" y="0" width="1200" height="620" rx="16" fill="#ffffff"/>
+
   <!-- RUNTIME lane -->
   <text class="lane" x="40" y="46">RUNTIME</text>
 
