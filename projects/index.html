@@ -45,6 +45,16 @@
 <div class="container" style="padding-bottom:72px">
 <div class="grid-auto project-grid">
 <article class="card" data-kind="engineering">
+  <div class="thumb fig"><img src="/img/homelab_architecture.svg" width="1200" height="620" alt="Architecture diagram of a self-hosted platform: a phone reaches app containers through a reverse proxy and single sign-on, the apps share a local language-model server and data volumes, and a GitOps pipeline deploys each push" loading="lazy"></div>
+  <div class="card-body">
+    <span class="kicker">Personal project · in daily use</span>
+    <h3><a href="/projects/homelab/">Self-hosted app platform</a></h3>
+    <p>More than ten web apps I built and run on a home server for my own daily use. <strong>LLMs handle language, classification and extraction</strong> on local models with a hosted-model fallback, while scoring and logic stay in deterministic code. Full GitOps delivery: every push is built, deployed and health-checked, behind a reverse proxy and single sign-on.</p>
+    <ul class="tags"><li>Python</li><li>FastAPI</li><li>Docker</li><li>CI/CD</li><li>LLMs</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="engineering">
   <div class="thumb"><img src="/img/techjobsradar.png" width="2400" height="1350" alt="Tech Jobs Radar overview page with skill demand charts" loading="lazy"></div>
   <div class="card-body">
     <span class="kicker">Live since September 2026</span>
@@ -81,6 +91,16 @@
     <h3><a href="/projects/retrostc-net/">RetroSTC-Net</a></h3>
     <p>Applies synaptic tagging and capture, a theory of how memories become permanent, to networks trained with backpropagation. I designed the mechanism and evaluated its <strong>consolidation log as an explanation</strong> of what the network retains.</p>
     <ul class="tags"><li>PyTorch</li><li>Continual learning</li><li>Explainability</li></ul>
+    <span class="more-link" aria-hidden="true">Read more →</span>
+  </div>
+</article>
+<article class="card" data-kind="ml">
+  <div class="thumb fig"><img src="/img/retail_propensity_ap.svg" width="720" height="430" alt="Bar chart: average precision on held-out months rises from 0.50 for the baseline to 0.69 for gradient-boosted trees" loading="lazy"></div>
+  <div class="card-body">
+    <span class="kicker">Personal project</span>
+    <h3><a href="/projects/retail-prediction/">Retail purchase prediction</a></h3>
+    <p>A PySpark pipeline on real retail transactions that segments customers with k-means and predicts purchase propensity per category. Evaluated on future months with a rolling time split, where gradient-boosted trees raised a category's average precision from <strong>0.50 to 0.69</strong>.</p>
+    <ul class="tags"><li>PySpark</li><li>Databricks</li><li>MLflow</li><li>scikit-learn</li><li>Terraform</li></ul>
     <span class="more-link" aria-hidden="true">Read more →</span>
   </div>
 </article>

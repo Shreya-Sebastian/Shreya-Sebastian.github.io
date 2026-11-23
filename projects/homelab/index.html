@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08142e">
+<meta name="description" content="A platform of more than ten self-hosted web apps I built for my own daily use, each using language models for a specific job, on hardware I host and administer myself.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Shreya Sebastian">
+<meta property="og:title" content="Self-hosted app platform | Shreya Sebastian">
+<meta property="og:description" content="A platform of more than ten self-hosted web apps I built for my own daily use, each using language models for a specific job, on hardware I host and administer myself.">
+<meta property="og:image" content="https://shreya-sebastian.github.io/img/share-card.jpg?v=4">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image">
+<title>Self-hosted app platform | Shreya Sebastian</title>
+<link rel="canonical" href="https://shreya-sebastian.github.io/projects/homelab/">
+<meta property="og:url" content="https://shreya-sebastian.github.io/projects/homelab/">
+<link rel="icon" href="/favicon.svg?v=5f0501af" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico?v=6c1ea5db" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cd11d9cd">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
+<link rel="stylesheet" href="/assets/style.css?v=6eb7174a">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Main">
+  <div class="container">
+    <a class="logo" href="/">Shreya Sebastian</a>
+    <ul><li class="home"><a href="/">About</a></li><li><a href="/projects/" aria-current="page">Projects</a></li><li><a href="/contact/">Contact</a></li><li><button class="theme-toggle" type="button" aria-label="Toggle dark mode"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></li></ul>
+  </div>
+</nav>
+<main id="main">
+
+<header class="p-hero">
+  <div class="container">
+    <a class="crumb" href="/projects/">← All projects</a>
+    <p class="eyebrow">Personal project · in daily use</p>
+    <h1>Self-hosted app platform</h1>
+    <p class="summary">A platform of more than ten small web apps I built for my own daily use (cooking, language learning, fitness, reading), each applying a language model to a specific job and running on hardware I host and administer myself.</p>
+
+    <figure class="p-figure fig"><img src="/img/homelab_architecture.svg" width="1200" height="620" alt="Architecture diagram: a phone reaches a Caddy reverse proxy with Authelia single sign-on, which routes to a set of FastAPI app containers; the apps share a local language-model server (Ollama), optional hosted model APIs and per-app data volumes; a GitOps delivery lane shows a push to main triggering CI, a Docker build and an automatic deploy with a health check."></figure>
+
+  </div>
+</header>
+<div class="container p-layout">
+  <article class="prose">
+
+<div class="callout tldr"><p class="tldr-label">Summary</p><ul><li>A platform of <strong>more than ten containerised web apps</strong> I designed, built and run on a home server, each reached through a single sign-on and installable on my phone as its own app.</li><li>LLMs are used for specific jobs (understanding language, classifying it, and extracting structured fields), running <strong>locally on an Ollama server</strong> (Llama 3.1, structured JSON output), with optional fallback to hosted models (Claude, Gemini, Amazon Bedrock) under a per-task budget.</li><li>A deliberate split throughout: the model does only language, classification and extraction, while <strong>every number, score and prediction is computed in deterministic, testable code</strong>.</li><li>Each push to <code>main</code> is built, deployed and health-checked automatically in a <strong>GitOps workflow</strong>, with Docker Compose per app, a reverse proxy and per-app data that survives every deploy.</li></ul></div>
+
+<h2>Overview</h2>
+<p>This is the software I run for myself, outside my studies and job applications. Over time it has grown into a small platform of more than ten web apps on one home server: a kitchen assistant that tracks a pantry and suggests meals from what is in it, a Dutch speaking-practice tutor, a recommender for local deals, a daily job-search agent, a voice-first notebook, health and fitness trackers, and a notification router that ties them together. Each is a separate app, but they share one login, one design language and one set of back-end services.</p>
+<p>I treat it as a place to build and operate real systems end to end. It is not a demo that is deployed once and left, but software I depend on every day, which has to stay up, keep my data safe and be cheap enough to run on a single machine.</p>
+
+<h2>The apps</h2>
+<ul>
+<li><b>Kitchen assistant.</b> Pantry inventory, barcode scanning and voice input, meal suggestions from current stock, and nutrition tracking against food databases. The model reads free text into foods and quantities; the nutrition maths is done in code.</li>
+<li><b>Dutch tutor.</b> A spoken-conversation partner that corrects and explains my sentences, with spaced repetition over my own mistakes. Speech is handled on-device by local models (speech-to-text and text-to-speech), and the conversation runs on a local LLM.</li>
+<li><b>Deals recommender.</b> Collects local offers and ranks them against my learned taste using <b>text embeddings</b> from the local model, rather than asking the model to choose.</li>
+<li><b>Job-search agent.</b> Crawls job sources on a daily schedule and scores each listing against <b>my own requirements</b>, requirement by requirement. The model judges whether each requirement is met, and the final score is computed in code rather than by the model.</li>
+<li><b>Deterministic by design.</b> Several apps, such as the fitness and cycle trackers, use <b>no LLM at all</b>: their predictions and summaries are plain, testable functions. Choosing where a model does and does not belong is part of the work.</li>
+</ul>
+
+<h2>Running the models</h2>
+<p>The default engine is a shared <b>Ollama</b> server holding one model at a time (Llama 3.1, 8B). Anywhere code reads the answer, the model is asked for <b>structured JSON against a schema</b>, so its output can be parsed and validated rather than scraped from prose. An app can be pointed at a stronger <b>hosted model</b> (Claude, Gemini or Amazon Bedrock) for tasks where the local model is not good enough; those calls run under a monthly budget and fall back to the local model when it is exhausted, with the cost of each task logged.</p>
+<p>The principle I keep to across every app is that the <b>language model is for language</b>: understanding text, classifying it and extracting fields. Everything that can be computed (sums, dates, nutrition, scores, predictions) is done in ordinary code, which is testable and cannot hallucinate. It makes the apps more reliable and their output explainable.</p>
+
+<h2>How it is deployed</h2>
+<pre>git push -> CI (Gitea Actions) -> Docker build -> deploy -> health check</pre>
+<ul>
+<li><b>GitOps.</b> A push to an app's <code>main</code> branch triggers a pipeline that builds the image, deploys the new container and checks its health; a failed health check is visible on the commit. Nothing is deployed by hand.</li>
+<li><b>Separation of code and operation.</b> How each app runs (its port, environment, mounts and network) lives in a separate Docker Compose definition, not in the app's own repository, so a change to application code can never alter its privileges or storage.</li>
+<li><b>Routing and access.</b> A reverse proxy is configured from container labels and reloaded without downtime; a single sign-on (SSO) layer sits in front of everything and passes each app a trusted user identity, so every app keeps per-user data without implementing its own login.</li>
+<li><b>State and secrets.</b> Each app keeps its data in a volume that survives deploys; secrets live in environment files on the host and are never committed. Scheduled jobs run on a timer, and health is watched with push notifications when something goes down.</li>
+</ul>
+
+<h2>What I take from it</h2>
+<p>Running this has taught me the parts of the job that a notebook does not: containerising and deploying services, keeping them observable and recoverable, working within a tight memory and cost budget, and making deliberate engineering choices about where a language model earns its place and where it does not. It is also simply useful: I reach for these apps every day.</p>
+
+  </article>
+  <aside class="p-side">
+    <dl><div><dt>Type</dt><dd>Personal project</dd></div><div><dt>Status</dt><dd>In daily use, self-hosted</dd></div><div><dt>Stack</dt><dd>Python, FastAPI, SQLite, PostgreSQL, Docker, Docker Compose, CI/CD, GitOps, Linux, local LLMs (Ollama), embeddings</dd></div></dl>
+  </aside>
+</div>
+<nav class="next" aria-label="More projects"><div class="container"><a class="right" href="/projects/tech-jobs-radar/"><span>Next →</span><b>Tech Jobs Radar</b></a></div></nav>
+
+</main>
+<footer><div class="container"><span>© 2026 Shreya Sebastian</span><span><a href="https://github.com/Shreya-Sebastian">GitHub</a><a href="https://www.linkedin.com/in/shreya-sebastian">LinkedIn</a><a href="/Shreya_Sebastian_CV.pdf">CV</a></span></div></footer>
+<script src="/assets/site.js?v=4b2a9e61"></script>
+</body>
+</html>
