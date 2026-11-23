@@ -106,7 +106,7 @@
   <path class="edge" d="M468 500 H518" marker-end="url(#ah)"/>
   <path class="edge" d="M688 500 H738" marker-end="url(#ah)"/>
 
-  <!-- redeploy loop back to app containers -->
-  <path class="dash" d="M952 500 H1120 V116 H1164" marker-end="url(#ah)"/>
-  <text class="cap" x="1112" y="104" text-anchor="end">redeploys</text>
+  <!-- redeploy loop back to app containers (routed over the top, clear of every box) -->
+  <path class="dash" d="M952 500 H1180 V40 H1066 V50" marker-end="url(#ah)"/>
+  <text class="cap" x="1174" y="33" text-anchor="end">redeploys</text>
 </svg>
