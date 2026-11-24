@@ -63,7 +63,7 @@
   <path class="edge" d="M420 116 H466" marker-end="url(#ah)"/>
 
   <!-- SERVICES lane -->
-  <text class="lane" x="470" y="236">SHARED SERVICES</text>
+  <text class="lane" x="40" y="236">SHARED SERVICES</text>
   <rect class="box" x="470" y="250" width="210" height="96" rx="12"/>
   <text class="t" x="575" y="286" text-anchor="middle">Ollama</text>
   <text class="s" x="575" y="307" text-anchor="middle">local LLMs · Llama 3.1</text>
