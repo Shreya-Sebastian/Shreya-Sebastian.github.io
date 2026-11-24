@@ -71,7 +71,7 @@
 
   <rect class="box" x="700" y="250" width="220" height="96" rx="12"/>
   <text class="t" x="810" y="286" text-anchor="middle">Hosted APIs</text>
-  <text class="s" x="810" y="307" text-anchor="middle">Claude · Gemini · Bedrock</text>
+  <text class="s" x="810" y="307" text-anchor="middle">Claude · Gemini</text>
   <text class="cap" x="810" y="324" text-anchor="middle">optional fallback</text>
 
   <rect class="box" x="940" y="250" width="220" height="96" rx="12"/>
